@@ -852,6 +852,9 @@ class AlphaFuturesScanner:
             uptime = datetime.now() - self.start_time
             hours, remainder = divmod(uptime.total_seconds(), 3600)
             minutes, seconds = divmod(remainder, 60)
+
+            btc_data = self.bybit_client.get_tickers(category="linear", symbol="BTCUSDT")
+            btc_price = float(btc_data['result']['list'][0]['lastPrice'])
             
             message = "\n".join([
                 "🤖 *ОТЧЕТ О СОСТОЯНИИ БОТА*",
@@ -866,6 +869,7 @@ class AlphaFuturesScanner:
                 f"*Следующее сканирование:* через {self.config.SCAN_INTERVAL} сек",
                 f"*Мониторинг токенов:* {self.config.MAX_SYMBOLS}",
                 f"*Риск на сделку:* {self.config.RISK_PER_TRADE}%",
+                f"*Цена BTC:* ${btc_price:.2f}"
             ])
             
             await self.send_telegram_message(message)
