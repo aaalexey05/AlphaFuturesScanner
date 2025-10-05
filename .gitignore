@@ -30,6 +30,8 @@ wheels/
 # Базы данных и истории
 *.db
 *.sqlite3
+trade_history.json.bac
+trade_history.json.corrupted
 trade_history.json
 
 # IDE

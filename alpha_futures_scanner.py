@@ -64,6 +64,7 @@ class BotConfig:
     TELEGRAM_CHAT_ID: str
     BYBIT_API_KEY: str = ""
     BYBIT_API_SECRET: str = ""
+    # TESTNET: bool = True 
     TESTNET: bool = False # По умолчанию работаем на реальном рынке
     SCAN_INTERVAL: int = 300
     MAX_SYMBOLS: int = 50
@@ -540,7 +541,7 @@ class AlphaFuturesScanner:
             logger.error(f"Ошибка расчета ATR: {e}")
             return 0
     
-    def run_enhanced_checklist(self, symbol: str, data: Dict, indicators: Dict) -> Tuple[bool, float, Dict]:
+    def run_enhanced_checklist(self, symbol: str, data: Dict, indicators: Dict) -> Tuple[bool, float, Dict, str]:
         """Улучшенный чеклист с весовой системой"""
         try:
             checks = {
@@ -554,7 +555,6 @@ class AlphaFuturesScanner:
                 'Рыночные условия': self.check_market_conditions(symbol)
             }
             
-            # Веса для каждого пункта
             weights = {
                 'Тренд': 0.20,
                 'Объем': 0.15,
@@ -566,28 +566,26 @@ class AlphaFuturesScanner:
                 'Рыночные условия': 0.10
             }
             
-            # Расчет общего score
             total_score = 0
             for check_name, passed in checks.items():
                 if passed:
                     total_score += weights.get(check_name, 0)
             
-            # Определение силы сигнала
             signal_strength = self.determine_signal_strength(total_score)
-            
-            # Минимальный проходной балл - 70%
-            passed = total_score >= 0.7
+            passed = total_score >= 0.6
+            signal_direction = "Long" if self.check_trend_alignment(indicators) else "Short"
             
             logger.info(
                 f"Чеклист для {symbol}: score = {total_score:.2f}, "
-                f"пройдено = {passed}, сила = {signal_strength.name}"
+                f"пройдено = {passed}, сила = {signal_strength.name}, "
+                f"направление = {signal_direction}"
             )
             
-            return passed, total_score, checks
+            return passed, total_score, checks, signal_direction
             
         except Exception as e:
             logger.error(f"Ошибка выполнения чеклиста для {symbol}: {e}")
-            return False, 0, {}
+            return False, 0, {}, "Unknown"
     
     def determine_signal_strength(self, score: float) -> SignalStrength:
         """Определение силы сигнала на основе score"""
@@ -724,49 +722,42 @@ class AlphaFuturesScanner:
         try:
             logger.debug(f"Анализируем символ: {symbol}")
             
-            # Получаем данные
             data = await self.get_symbol_data(symbol)
             if not data:
                 return
             
-            # Вычисляем индикаторы
             indicators = self.calculate_technical_indicators(data['klines'])
             if not indicators:
                 return
             
-            # Запускаем чеклист
-            checklist_passed, score, checklist_results = self.run_enhanced_checklist(
+            checklist_passed, score, checklist_results, signal_direction = self.run_enhanced_checklist(
                 symbol, data, indicators
             )
             
             if checklist_passed:
-                # Определяем точку входа и стоп-лосс
                 entry_price = indicators['current_price']
-                stop_loss = entry_price * 0.98  # Стоп-лосс на 2% ниже
+                stop_loss = entry_price * 0.98
                 
-                # Рассчитываем размер позиции
                 position_info = await self.calculate_position_size(
                     symbol, entry_price, stop_loss
                 )
                 
-                # Формируем сигнал
                 signal = {
                     'symbol': symbol,
                     'entry_price': entry_price,
                     'stop_loss': stop_loss,
-                    'take_profit': entry_price * 1.06,  # Тейк-профит на 6% выше
+                    'take_profit': entry_price * 1.06,
                     'score': score,
                     'strength': self.determine_signal_strength(score),
                     'position_size': position_info['size'],
                     'risk_amount': position_info['risk_amount'],
                     'timestamp': datetime.now().isoformat(),
-                    'indicators': indicators
+                    'indicators': indicators,
+                    'direction': signal_direction
                 }
                 
-                # Отправляем сигнал
                 await self.send_trading_signal(signal, checklist_results, position_info)
                 
-                # Сохраняем в историю
                 self.trade_history.append({
                     'signal': signal,
                     'checklist_results': checklist_results,
@@ -781,58 +772,59 @@ class AlphaFuturesScanner:
             self.errors_count += 1
     
     async def send_trading_signal(self, signal: Dict, checklist_results: Dict, position_info: Dict):
-        """Отправка детализированного торгового сигнала"""
-        try:
-            strength_emoji = {
-                SignalStrength.WEAK: "🟡",
-                SignalStrength.MEDIUM: "🟢",
-                SignalStrength.STRONG: "🔵",
-                SignalStrength.VERY_STRONG: "🚀"
-            }
-            emoji = strength_emoji.get(signal['strength'], "📈")
-            
-            # Безопасное получение параметров
-            risk_percent = position_info.get('risk_percent', 0.0)
-            leverage_suggestion = position_info.get('leverage_suggestion', 0.0)
-            
-            message_parts = [
-                f"{emoji} *ТОРГОВЫЙ СИГНАЛ* {emoji}",
-                f"*Токен:* `{signal['symbol']}`",
-                f"*Сила сигнала:* {signal['strength'].name.replace('_', ' ').title()} ({signal['score']:.1%})",
-                "",
-                "*🎯 Параметры входа:*",
-                f"• Цена входа: `${signal['entry_price']:.4f}`",
-                f"• Стоп-лосс: `${signal['stop_loss']:.4f}` (-{100*(1-signal['stop_loss']/signal['entry_price']):.1f}%)",
-                f"• Тейк-профит: `${signal['take_profit']:.4f}` (+{100*(signal['take_profit']/signal['entry_price']-1):.1f}%)",
-                f"• Риск/прибыль: 1:{((signal['take_profit']-signal['entry_price'])/(signal['entry_price']-signal['stop_loss'])):.1f}",
-                "",
-                "*📊 Параметры позиции:*",
-                f"• Размер позиции: `{signal['position_size']:.2f} USDT`",
-                f"• Сумма риска: `{signal['risk_amount']:.2f} USDT`",
-                f"• Риск на сделку: `{risk_percent:.1f}%`",
-                f"• Рекомендуемое плечо: `{leverage_suggestion:.0f}x`",
-                "",
-                "*✅ Результаты чеклиста:*"
-            ]
-            
-            for check_name, passed in checklist_results.items():
-                status = "✅" if passed else "❌"
-                message_parts.append(f"{status} {check_name}")
-            
-            message_parts.extend([
-                "",
-                f"*📈 Индикаторы:* RSI {signal['indicators'].get('rsi', 0):.1f}, "
-                f"MACD {signal['indicators'].get('macd', 0):.4f}",
-                f"*⏰ Время:* {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
-                ""
-            ])
-            
-            message = "\n".join(message_parts)
-            await self.send_telegram_message(message)
-            logger.info(f"Торговый сигнал отправлен для {signal['symbol']}")
-        except Exception as e:
-            logger.error(f"Ошибка отправки сигнала для {signal['symbol']}: {e}")
-            self.errors_count += 1
+            """Отправка детализированного торгового сигнала"""
+            try:
+                strength_emoji = {
+                    SignalStrength.WEAK: "🟡",
+                    SignalStrength.MEDIUM: "🟢",
+                    SignalStrength.STRONG: "🔵",
+                    SignalStrength.VERY_STRONG: "🚀"
+                }
+                emoji = strength_emoji.get(signal['strength'], "📈")
+                
+                risk_percent = position_info.get('risk_percent', 0.0)
+                leverage_suggestion = position_info.get('leverage_suggestion', 0.0)
+                direction = signal.get('direction', 'Unknown')
+                
+                message_parts = [
+                    f"{emoji} *ТОРГОВЫЙ СИГНАЛ* {emoji}",
+                    f"*Токен:* `{signal['symbol']}`",
+                    f"*Направление:* {direction}",
+                    f"*Сила сигнала:* {signal['strength'].name.replace('_', ' ').title()} ({signal['score']:.1%})",
+                    "",
+                    "*🎯 Параметры входа:*",
+                    f"• Цена входа: `${signal['entry_price']:.4f}`",
+                    f"• Стоп-лосс: `${signal['stop_loss']:.4f}` (-{100*(1-signal['stop_loss']/signal['entry_price']):.1f}%)",
+                    f"• Тейк-профит: `${signal['take_profit']:.4f}` (+{100*(signal['take_profit']/signal['entry_price']-1):.1f}%)",
+                    f"• Риск/прибыль: 1:{((signal['take_profit']-signal['entry_price'])/(signal['entry_price']-signal['stop_loss'])):.1f}",
+                    "",
+                    "*📊 Параметры позиции:*",
+                    f"• Размер позиции: `{signal['position_size']:.2f} USDT`",
+                    f"• Сумма риска: `{signal['risk_amount']:.2f} USDT`",
+                    f"• Риск на сделку: `{risk_percent:.1f}%`",
+                    f"• Рекомендуемое плечо: `{leverage_suggestion:.0f}x`",
+                    "",
+                    "*✅ Результаты чеклиста:*"
+                ]
+                
+                for check_name, passed in checklist_results.items():
+                    status = "✅" if passed else "❌"
+                    message_parts.append(f"{status} {check_name}")
+                
+                message_parts.extend([
+                    "",
+                    f"*📈 Индикаторы:* RSI {signal['indicators'].get('rsi', 0):.1f}, "
+                    f"MACD {signal['indicators'].get('macd', 0):.4f}",
+                    f"*⏰ Время:* {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+                    ""
+                ])
+                
+                message = "\n".join(message_parts)
+                await self.send_telegram_message(message)
+                logger.info(f"Торговый сигнал отправлен для {signal['symbol']}, направление: {direction}")
+            except Exception as e:
+                logger.error(f"Ошибка отправки сигнала для {signal['symbol']}: {e}")
+                self.errors_count += 1
     
     async def send_health_report(self):
         """Отправка отчета о состоянии бота"""
