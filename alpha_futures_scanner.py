@@ -23,10 +23,6 @@ import numpy as np
 from pybit.unified_trading import HTTP
 from telegram import Bot
 from telegram.error import TelegramError
-from telegram.helpers import escape_markdown
-
-from advanced_checklist_integration import add_advanced_checklist_to_bot
-
 
 # Загружаем переменные из .env файла
 load_dotenv()
@@ -68,7 +64,7 @@ class BotConfig:
     TELEGRAM_CHAT_ID: str
     BYBIT_API_KEY: str = ""
     BYBIT_API_SECRET: str = ""
-    TESTNET: bool = False
+    TESTNET: bool = False # По умолчанию работаем на реальном рынке
     SCAN_INTERVAL: int = 300
     MAX_SYMBOLS: int = 50
     RISK_PER_TRADE: float = 1.0
@@ -81,6 +77,7 @@ class BotConfig:
     HEALTH_CHECK_INTERVAL: int = 3600
     
     def __post_init__(self):
+        """Валидация конфигурации после инициализации"""
         if not self.TELEGRAM_BOT_TOKEN or not self.TELEGRAM_CHAT_ID:
             raise ValueError("TELEGRAM_BOT_TOKEN и TELEGRAM_CHAT_ID обязательны")
         
@@ -96,6 +93,7 @@ class ConnectionManager:
         self.retry_count = 0
     
     async def execute_with_retry(self, func, *args, **kwargs):
+        """Выполнение функции с повторными попытками при ошибках"""
         last_exception = None
         
         for attempt in range(self.max_retries):
@@ -106,7 +104,6 @@ class ConnectionManager:
                     result = func(*args, **kwargs)
                 self.retry_count = 0
                 return result
-                
             except Exception as e:
                 last_exception = e
                 self.retry_count += 1
@@ -133,7 +130,7 @@ class SignalStrength(Enum):
 
 class AlphaFuturesScanner:
     """Основной класс бота AlphaFutures Scanner"""
-
+    
     def __init__(self, config: BotConfig):
         self.config = config
         self.connection_manager = ConnectionManager()
@@ -148,8 +145,17 @@ class AlphaFuturesScanner:
         
         # Кэширование данных для оптимизации
         self.symbols_cache = {}
-        self.kline_cache = {}  # Кэш для данных свечей
         self.cache_timeout = timedelta(minutes=5)
+
+        # Путь к файлу истории торгов
+        self.trade_history_file = "trade_history.json"
+        self.trade_history = []
+        
+        # Создаем файл истории, если он не существует
+        if not os.path.exists(self.trade_history_file):
+            with open(self.trade_history_file, 'w', encoding='utf-8') as f:
+                json.dump([], f, indent=2, ensure_ascii=False)
+            logger.info(f"Создан новый файл {self.trade_history_file}")
         
         self.setup_clients()
         self.load_trade_history()
@@ -178,72 +184,90 @@ class AlphaFuturesScanner:
             logger.error(f"Ошибка инициализации клиентов: {e}")
             raise
     
-    def load_trade_history(self):
-            """Загрузка истории торгов с обработкой ошибок"""
-            self.trade_history_file = 'trade_history.json'
-            self.trade_history = []
-            
-            if os.path.exists(self.trade_history_file):
+    def recover_trade_history(self):
+        """Восстановление поврежденного файла trade_history.json"""
+        try:
+            backup_file = self.trade_history_file + '.bak'
+            if os.path.exists(backup_file):
+                with open(backup_file, 'r', encoding='utf-8') as f:
+                    self.trade_history = json.load(f)
+                logger.info(f"Восстановлено {len(self.trade_history)} записей из бэкапа")
+                return
+
+            # Попытка чтения файла построчно для нахождения последней валидной записи
+            valid_data = []
+            with open(self.trade_history_file, 'r', encoding='utf-8') as f:
+                content = f.read()
                 try:
-                    with open(self.trade_history_file, 'r', encoding='utf-8') as f:
-                        self.trade_history = json.load(f)
-                    logger.info(f"Загружено {len(self.trade_history)} записей из истории торгов")
-                except Exception as e:
-                    logger.error(f"Ошибка загрузки истории торгов: {e}. Создаём новую историю.")
-                    self.trade_history = []  # Если ошибка — пустая история
+                    valid_data = json.loads(content[:content.rfind('}')+1])
+                    self.trade_history = valid_data if isinstance(valid_data, list) else [valid_data]
+                    logger.info(f"Восстановлено {len(self.trade_history)} записей из поврежденного файла")
+                except json.JSONDecodeError:
+                    logger.error("Не удалось восстановить файл, создаем пустой")
+                    self.trade_history = []
+            
+            # Создаем резервную копию поврежденного файла
+            if os.path.exists(self.trade_history_file):
+                os.rename(self.trade_history_file, self.trade_history_file + '.corrupted')
+            with open(self.trade_history_file, 'w', encoding='utf-8') as f:
+                json.dump(self.trade_history, f, indent=2, ensure_ascii=False)
+        except Exception as e:
+            logger.error(f"Ошибка восстановления истории торгов: {e}")
+            self.trade_history = []
+    
+    def load_trade_history(self):
+        """Загрузка истории торгов с обработкой ошибок"""
+        self.trade_history = []
+        if not os.path.exists(self.trade_history_file):
+            logger.info("Файл истории торгов не найден, создан пустой список")
+            return
+
+        try:
+            with open(self.trade_history_file, 'r', encoding='utf-8') as f:
+                self.trade_history = json.load(f)
+            logger.info(f"Загружено {len(self.trade_history)} записей из истории торгов")
+        except json.JSONDecodeError as e:
+            logger.error(f"Ошибка парсинга trade_history.json: {e}")
+            logger.info("Попытка восстановления файла...")
+            self.recover_trade_history()
+        except Exception as e:
+            logger.error(f"Ошибка загрузки истории торгов: {e}")
     
     def save_trade_history(self):
-        """Сохранение истории торгов с обработкой ошибок и проверкой сериализации"""
+        """Сохранение истории торгов с обработкой ошибок"""
         try:
-            history_to_save = []
-            for entry in self.trade_history[-1000:]:
-                entry_copy = entry.copy()
-                
-                # Обработка signal
-                if 'signal' in entry_copy and 'strength' in entry_copy['signal']:
-                    strength = entry_copy['signal']['strength']
-                    if isinstance(strength, SignalStrength):
-                        entry_copy['signal']['strength'] = strength.name  # Enum в строку
-                    elif isinstance(strength, str):
-                        pass  # Уже строка
-                    else:
-                        logger.warning(f"Неверный тип strength: {type(strength)}")
-                
-                # Обработка checklist_results
-                if 'checklist_results' in entry_copy:
-                    checklist = entry_copy['checklist_results']
-                    for key, value in checklist.items():
-                        if isinstance(value, bool):
-                            checklist[key] = bool(value)  # Убедимся, что bool остаётся bool
-                        elif isinstance(value, (int, float, str, type(None))):
-                            pass  # Эти типы сериализуемы
-                        else:
-                            logger.warning(f"Несериализуемое значение в checklist_results: {key}={value}, тип={type(value)}")
-                            checklist[key] = str(value)  # Конвертируем в строку
-                    entry_copy['checklist_results'] = checklist
-                
-                history_to_save.append(entry_copy)
+            def convert_to_serializable(obj):
+                if isinstance(obj, (np.bool_, bool)):
+                    return bool(obj)
+                if isinstance(obj, (np.floating, float)):
+                    return float(obj)
+                if isinstance(obj, (np.integer, int)):
+                    return int(obj)
+                if isinstance(obj, np.ndarray):
+                    return obj.tolist()
+                if isinstance(obj, Enum):
+                    return obj.name
+                if isinstance(obj, dict):
+                    return {k: convert_to_serializable(v) for k, v in obj.items()}
+                if isinstance(obj, list):
+                    return [convert_to_serializable(v) for v in obj]
+                return obj
             
-            # Проверка сериализации перед записью
-            logger.debug(f"Сохраняем историю: {history_to_save}")
-            json_str = json.dumps(history_to_save, indent=2, ensure_ascii=False)
+            serializable_history = convert_to_serializable(self.trade_history[-1000:])
             
-            # Запись в файл с принудительным сбросом буфера
+            # Создаем резервную копию перед записью
+            if os.path.exists(self.trade_history_file):
+                os.rename(self.trade_history_file, self.trade_history_file + '.bak')
+            
             with open(self.trade_history_file, 'w', encoding='utf-8') as f:
-                f.write(json_str)
-                f.flush()  # Принудительный сброс буфера
-                os.fsync(f.fileno())  # Убедимся, что данные записаны на диск
-            
-            logger.info(f"Сохранено {len(history_to_save)} записей в trade_history.json")
-            
+                json.dump(serializable_history, f, indent=2, ensure_ascii=False)
+            logger.info(f"Сохранено {len(serializable_history)} записей в trade_history.json")
         except Exception as e:
             logger.error(f"Ошибка сохранения истории торгов: {e}")
-            raise
     
     async def send_telegram_message(self, message: str, parse_mode: str = 'Markdown'):
         """Отправка сообщения в Telegram с повторными попытками"""
         try:
-            message = escape_markdown(message, version=2)  # Используем версию 2 для MarkdownV2
             await self.connection_manager.execute_with_retry(
                 self.telegram_bot.send_message,
                 chat_id=self.config.TELEGRAM_CHAT_ID,
@@ -274,52 +298,51 @@ class AlphaFuturesScanner:
             return None
     
     async def calculate_position_size(self, symbol: str, entry_price: float, stop_loss: float) -> Dict[str, float]:
-            """Расчет размера позиции на основе риск-менеджмента"""
-            try:
-                balance = await self.get_account_balance()
-                if not balance:
-                    logger.debug(f"Баланс недоступен для {symbol}, размер позиции = 0")
-                    return {'size': 0, 'risk_amount': 0, 'risk_percent': 0, 'leverage_suggestion': 1}
-                
-                # Расчет риска на сделку
-                risk_amount = balance * (self.config.RISK_PER_TRADE / 100)
-                
-                # Расчет цены стоп-лосса
-                price_diff = abs(entry_price - stop_loss)
-                risk_percent = price_diff / entry_price if entry_price != 0 else 0
-                
-                if risk_percent == 0:
-                    logger.warning(f"Нулевой риск для {symbol}, размер позиции = 0")
-                    return {'size': 0, 'risk_amount': 0, 'risk_percent': 0, 'leverage_suggestion': 1}
-                
-                # Расчет размера позиции
-                position_size = risk_amount / risk_percent
-                
-                # Ограничение размера позиции (не более 10% от баланса)
-                max_position_size = balance * 0.1
-                if position_size > max_position_size:
-                    position_size = max_position_size
-                    risk_amount = position_size * risk_percent
-                    logger.warning(f"Размер позиции ограничен до {max_position_size:.2f}")
-                
-                result = {
-                    'size': position_size,
-                    'risk_amount': risk_amount,
-                    'risk_percent': risk_percent * 100,
-                    'leverage_suggestion': min(10, int(1 / risk_percent)) if risk_percent != 0 else 1
-                }
-                
-                logger.info(
-                    f"Расчет позиции для {symbol}: "
-                    f"размер = {position_size:.2f}, риск = {risk_amount:.2f} USDT"
-                )
-                
-                return result
-                
-            except Exception as e:
-                logger.error(f"Ошибка расчета размера позиции для {symbol}: {e}")
-                return {'size': 0, 'risk_amount': 0, 'risk_percent': 0, 'leverage_suggestion': 1}
-        
+        """Расчет размера позиции на основе риск-менеджмента"""
+        default_result = {
+            'size': 0.0,
+            'risk_amount': 0.0,
+            'risk_percent': 0.0,
+            'leverage_suggestion': 0.0
+        }
+        try:
+            balance = await self.get_account_balance()
+            if not balance or balance <= 0:
+                logger.warning(f"Баланс 0 для {symbol}, позиция не рассчитана")
+                return default_result
+            
+            risk_amount = balance * (self.config.RISK_PER_TRADE / 100)
+            price_diff = abs(entry_price - stop_loss)
+            risk_percent = (price_diff / entry_price) * 100 if entry_price != 0 else 0.0
+            
+            if risk_percent == 0:
+                logger.warning(f"Нулевой риск для {symbol}, позиция не рассчитана")
+                return default_result
+            
+            position_size = risk_amount / (price_diff / entry_price)
+            max_position_size = balance * 0.1
+            if position_size > max_position_size:
+                position_size = max_position_size
+                risk_amount = position_size * (price_diff / entry_price)
+                logger.warning(f"Размер позиции ограничен до {max_position_size:.2f}")
+            
+            result = {
+                'size': float(position_size),
+                'risk_amount': float(risk_amount),
+                'risk_percent': float(risk_percent),
+                'leverage_suggestion': float(min(10, int(1 / (price_diff / entry_price))) if price_diff != 0 else 0)
+            }
+            
+            logger.info(
+                f"Расчет позиции для {symbol}: "
+                f"размер = {position_size:.2f}, риск = {risk_amount:.2f} USDT, "
+                f"риск % = {risk_percent:.1f}, плечо = {result['leverage_suggestion']}"
+            )
+            return result
+        except Exception as e:
+            logger.error(f"Ошибка расчета размера позиции для {symbol}: {e}")
+            return default_result
+    
     async def get_all_futures_symbols(self) -> List[str]:
         """Получение списка фьючерсных пар с кэшированием"""
         cache_key = "all_symbols"
@@ -357,6 +380,7 @@ class AlphaFuturesScanner:
         
         for symbol in symbols[:self.config.MAX_SYMBOLS]:
             try:
+                # Получаем данные об объеме
                 ticker_response = await asyncio.get_event_loop().run_in_executor(
                     None,
                     lambda: self.bybit_client.get_tickers(
@@ -369,13 +393,9 @@ class AlphaFuturesScanner:
                 volume_24h = float(ticker_data.get('volume24h', 0))
                 turnover_24h = float(ticker_data.get('turnover24h', 0))
                 
-                logger.debug(f"Символ {symbol}: volume_24h={volume_24h}, turnover_24h={turnover_24h}")
-                
-                if volume_24h > 1000:  # Пропускаем только активные пары
+                # Фильтруем по минимальному объему и обороту
+                if volume_24h > 100000 and turnover_24h > 1000000:
                     filtered_symbols.append(symbol)
-                    logger.info(f"Символ {symbol} добавлен для анализа")
-                else:
-                    logger.debug(f"Символ {symbol} отсеян: низкий объем")
                     
             except Exception as e:
                 logger.warning(f"Не удалось получить данные для {symbol}: {e}")
@@ -408,20 +428,14 @@ class AlphaFuturesScanner:
             )
             
             # Получаем ставку финансирования
-            funding_response = None
-            try:
-                funding_response = await asyncio.get_event_loop().run_in_executor(
-                    None,
-                    lambda: self.bybit_client.get_funding_rate_history(
-                        category="linear",
-                        symbol=symbol,
-                        limit=1  # Только последняя ставка
-                    )
+            funding_response = await asyncio.get_event_loop().run_in_executor(
+                None,
+                lambda: self.bybit_client.get_funding_rate_history(
+                    category="linear",
+                    symbol=symbol,
+                    limit=1
                 )
-                logger.debug(f"Ставка финансирования для {symbol}: {funding_response['result']}")
-            except Exception as funding_error:
-                logger.warning(f"Ошибка получения ставки финансирования для {symbol}: {funding_error}. Продолжаем без неё.")
-                funding_response = {'result': {'list': [{'fundingRate': '0'}]}}  # Дефолтное значение
+            )
             
             return {
                 'symbol': symbol,
@@ -469,7 +483,6 @@ class AlphaFuturesScanner:
                 'volume_avg': np.mean(df['volume'].values[-20:])
             }
             
-            logger.debug(f"Индикаторы для {df['symbol'].iloc[0] if 'symbol' in df else 'символа'}: {indicators}")
             return indicators
             
         except Exception as e:
@@ -527,8 +540,8 @@ class AlphaFuturesScanner:
             logger.error(f"Ошибка расчета ATR: {e}")
             return 0
     
-    async def run_enhanced_checklist(self, symbol: str, data: Dict, indicators: Dict) -> Tuple[bool, float, Dict]:
-        """Улучшенный чеклист с весовой системой (порог 0.6)"""
+    def run_enhanced_checklist(self, symbol: str, data: Dict, indicators: Dict) -> Tuple[bool, float, Dict]:
+        """Улучшенный чеклист с весовой системой"""
         try:
             checks = {
                 'Тренд': self.check_trend_alignment(indicators),
@@ -555,19 +568,19 @@ class AlphaFuturesScanner:
             
             # Расчет общего score
             total_score = 0
-            passed_checks = 0
             for check_name, passed in checks.items():
-                logger.debug(f"Проверка '{check_name}': результат = {passed}")
                 if passed:
                     total_score += weights.get(check_name, 0)
-                    passed_checks += 1
             
-            # Порог в 60%
-            passed = total_score >= 0.6
+            # Определение силы сигнала
+            signal_strength = self.determine_signal_strength(total_score)
+            
+            # Минимальный проходной балл - 70%
+            passed = total_score >= 0.7
             
             logger.info(
                 f"Чеклист для {symbol}: score = {total_score:.2f}, "
-                f"пройдено {passed_checks}/8 проверок, сигнал = {passed}"
+                f"пройдено = {passed}, сила = {signal_strength.name}"
             )
             
             return passed, total_score, checks
@@ -586,28 +599,6 @@ class AlphaFuturesScanner:
             return SignalStrength.MEDIUM
         else:
             return SignalStrength.WEAK
-
-    def determine_signal_direction(self, indicators: Dict) -> str:
-        """Определение направления сигнала (Long/Short) на основе индикаторов"""
-        rsi = indicators.get('rsi', 50)
-        macd = indicators.get('macd', 0)
-        macd_signal = indicators.get('macd_signal', 0)
-        price = indicators.get('current_price', 0)
-        sma_20 = indicators.get('sma_20', 0)
-
-        # Long: восходящий тренд, положительный моментум
-        if (price > sma_20 and macd > macd_signal and rsi < 70):
-            return "Long"
-        # Short: нисходящий тренд, отрицательный моментуm
-        elif (price < sma_20 and macd < macd_signal and rsi > 30):
-            return "Short"
-        # Нейтрально: используем RSI для определения
-        elif rsi > 70:
-            return "Short"  # Перекупленность
-        elif rsi < 30:
-            return "Long"  # Перепроданность
-        # По умолчанию Long
-        return "Long"
     
     def check_trend_alignment(self, indicators: Dict) -> bool:
         """Проверка соответствия тренду"""
@@ -729,128 +720,118 @@ class AlphaFuturesScanner:
         return True
     
     async def analyze_symbol(self, symbol: str):
-            """Анализ конкретного символа"""
-            try:
-                logger.debug(f"Анализируем символ: {symbol}")
+        """Анализ конкретного символа"""
+        try:
+            logger.debug(f"Анализируем символ: {symbol}")
+            
+            # Получаем данные
+            data = await self.get_symbol_data(symbol)
+            if not data:
+                return
+            
+            # Вычисляем индикаторы
+            indicators = self.calculate_technical_indicators(data['klines'])
+            if not indicators:
+                return
+            
+            # Запускаем чеклист
+            checklist_passed, score, checklist_results = self.run_enhanced_checklist(
+                symbol, data, indicators
+            )
+            
+            if checklist_passed:
+                # Определяем точку входа и стоп-лосс
+                entry_price = indicators['current_price']
+                stop_loss = entry_price * 0.98  # Стоп-лосс на 2% ниже
                 
-                # Получаем данные
-                data = await self.get_symbol_data(symbol)
-                if not data:
-                    logger.warning(f"Нет данных для {symbol}")
-                    return
+                # Рассчитываем размер позиции
+                position_info = await self.calculate_position_size(
+                    symbol, entry_price, stop_loss
+                )
                 
-                # Вычисляем индикаторы
-                indicators = self.calculate_technical_indicators(data['klines'])
-                if not indicators:
-                    logger.warning(f"Нет индикаторов для {symbol}")
-                    return
+                # Формируем сигнал
+                signal = {
+                    'symbol': symbol,
+                    'entry_price': entry_price,
+                    'stop_loss': stop_loss,
+                    'take_profit': entry_price * 1.06,  # Тейк-профит на 6% выше
+                    'score': score,
+                    'strength': self.determine_signal_strength(score),
+                    'position_size': position_info['size'],
+                    'risk_amount': position_info['risk_amount'],
+                    'timestamp': datetime.now().isoformat(),
+                    'indicators': indicators
+                }
                 
-                # Запускаем чеклист
-                checklist_passed, score, checklist_results = await self.run_comprehensive_checklist(symbol, data, indicators)
+                # Отправляем сигнал
+                await self.send_trading_signal(signal, checklist_results, position_info)
                 
-                if checklist_passed:
-                    # Определяем точку входа и стоп-лосс
-                    entry_price = indicators['current_price']
-                    stop_loss = entry_price * 0.98  # Стоп-лосс на 2% ниже для Long
-                    take_profit = entry_price * 1.06  # Тейк-профит на 6% выше для Long
-
-                    # Определяем направление
-                    signal_direction = self.determine_signal_direction(indicators)
-                    if signal_direction == "Short":
-                        stop_loss = entry_price * 1.02  # Стоп-лосс на 2% выше для Short
-                        take_profit = entry_price * 0.94  # Тейк-профит на 6% ниже для Short
-
-                    # Рассчитываем размер позиции
-                    position_info = await self.calculate_position_size(symbol, entry_price, stop_loss)
-
-                    # Формируем сигнал
-                    signal = {
-                        'symbol': symbol,
-                        'entry_price': entry_price,
-                        'stop_loss': stop_loss,
-                        'take_profit': take_profit,
-                        'score': score,
-                        'strength': self.determine_signal_strength(score),
-                        'direction': signal_direction,
-                        'position_size': position_info['size'],
-                        'risk_amount': position_info['risk_amount'],
-                        'timestamp': datetime.now().isoformat(),
-                        'indicators': indicators
-                    }
-                    
-                    # Отправляем сигнал
-                    await self.send_trading_signal(signal, checklist_results, position_info)
-                    
-                    # Сохраняем в историю
-                    self.trade_history.append({
-                        'signal': signal,
-                        'checklist_results': checklist_results,
-                        'timestamp': datetime.now().isoformat()
-                    })
-                    self.save_trade_history()
-                    
-                    self.signals_sent += 1
-                    
-            except Exception as e:
-                logger.error(f"Ошибка анализа {symbol}: {e}")
-                self.errors_count += 1
+                # Сохраняем в историю
+                self.trade_history.append({
+                    'signal': signal,
+                    'checklist_results': checklist_results,
+                    'timestamp': datetime.now().isoformat()
+                })
+                self.save_trade_history()
+                
+                self.signals_sent += 1
+                
+        except Exception as e:
+            logger.error(f"Ошибка анализа {symbol}: {e}")
+            self.errors_count += 1
     
     async def send_trading_signal(self, signal: Dict, checklist_results: Dict, position_info: Dict):
         """Отправка детализированного торгового сигнала"""
         try:
             strength_emoji = {
                 SignalStrength.WEAK: "🟡",
-                SignalStrength.MEDIUM: "🟢", 
+                SignalStrength.MEDIUM: "🟢",
                 SignalStrength.STRONG: "🔵",
                 SignalStrength.VERY_STRONG: "🚀"
             }
-            
             emoji = strength_emoji.get(signal['strength'], "📈")
             
-            # Формируем сообщение
+            # Безопасное получение параметров
+            risk_percent = position_info.get('risk_percent', 0.0)
+            leverage_suggestion = position_info.get('leverage_suggestion', 0.0)
+            
             message_parts = [
-                f"{emoji} *ТОРГОВЫЙ СИГНАЛ* {emoji}\n",
-                f"*Токен:* `{signal['symbol']}`\n",
-                f"*Сила сигнала:* {signal['strength'].name.replace('_', ' ').title()} ({signal['score']:.1%})\n",
-                f"*Направление:* {signal['direction']}\n\n",
+                f"{emoji} *ТОРГОВЫЙ СИГНАЛ* {emoji}",
+                f"*Токен:* `{signal['symbol']}`",
+                f"*Сила сигнала:* {signal['strength'].name.replace('_', ' ').title()} ({signal['score']:.1%})",
                 "",
-                "*🎯 Параметры входа:*\n",
-                f"• Цена входа: `${signal['entry_price']:.4f}`\n",
-                f"• Стоп-лосс: `${signal['stop_loss']:.4f}` (-{100*(1-signal['stop_loss']/signal['entry_price']):.1f}%)\n",
-                f"• Тейк-профит: `${signal['take_profit']:.4f}` (+{100*(signal['take_profit']/signal['entry_price']-1):.1f}%)\n",
-                f"• Риск/прибыль: 1:{((signal['take_profit']-signal['entry_price'])/(signal['entry_price']-signal['stop_loss'])):.1f}\n\n",
+                "*🎯 Параметры входа:*",
+                f"• Цена входа: `${signal['entry_price']:.4f}`",
+                f"• Стоп-лосс: `${signal['stop_loss']:.4f}` (-{100*(1-signal['stop_loss']/signal['entry_price']):.1f}%)",
+                f"• Тейк-профит: `${signal['take_profit']:.4f}` (+{100*(signal['take_profit']/signal['entry_price']-1):.1f}%)",
+                f"• Риск/прибыль: 1:{((signal['take_profit']-signal['entry_price'])/(signal['entry_price']-signal['stop_loss'])):.1f}",
                 "",
-                "*📊 Параметры позиции:*\n",
-                f"• Размер позиции: `{signal['position_size']:.2f} USDT`\n",
-                f"• Сумма риска: `{signal['risk_amount']:.2f} USDT`\n",
-                f"• Риск на сделку: `{position_info['risk_percent']:.1f}%`\n",
-                f"• Рекомендуемое плечо: `{position_info['leverage_suggestion']}x`\n\n",
+                "*📊 Параметры позиции:*",
+                f"• Размер позиции: `{signal['position_size']:.2f} USDT`",
+                f"• Сумма риска: `{signal['risk_amount']:.2f} USDT`",
+                f"• Риск на сделку: `{risk_percent:.1f}%`",
+                f"• Рекомендуемое плечо: `{leverage_suggestion:.0f}x`",
                 "",
-                "*✅ Результаты чеклиста:*\n"
+                "*✅ Результаты чеклиста:*"
             ]
             
-            # Добавляем результаты проверок
             for check_name, passed in checklist_results.items():
                 status = "✅" if passed else "❌"
-                message_parts.append(f"{status} {check_name}\n")
+                message_parts.append(f"{status} {check_name}")
             
             message_parts.extend([
                 "",
-                f"*📈 Индикаторы:* RSI {signal['indicators'].get('rsi', 0):.1f}, \n"
-                f"MACD {signal['indicators'].get('macd', 0):.4f}\n",
-                f"*⏰ Время:* {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n",
-                "",
-                "⚠️ *ВНИМАНИЕ:* Всегда проверяйте параметры перед входом!\n",
-                "Это автоматический сигнал, торгуйте ответственно."
+                f"*📈 Индикаторы:* RSI {signal['indicators'].get('rsi', 0):.1f}, "
+                f"MACD {signal['indicators'].get('macd', 0):.4f}",
+                f"*⏰ Время:* {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+                ""
             ])
             
-            message = "".join(message_parts)
-            await self.send_telegram_message(message, parse_mode='MarkdownV2')
-            
-            logger.info(f"Отправлен торговый сигнал для {signal['symbol']}")
-            
+            message = "\n".join(message_parts)
+            await self.send_telegram_message(message)
+            logger.info(f"Торговый сигнал отправлен для {signal['symbol']}")
         except Exception as e:
-            logger.error(f"Ошибка отправки сигнала: {e}")
+            logger.error(f"Ошибка отправки сигнала для {signal['symbol']}: {e}")
             self.errors_count += 1
     
     async def send_health_report(self):
@@ -860,21 +841,22 @@ class AlphaFuturesScanner:
             hours, remainder = divmod(uptime.total_seconds(), 3600)
             minutes, seconds = divmod(remainder, 60)
             
-            message = (
-                "🤖 *ОТЧЕТ О СОСТОЯНИИ БОТА*\n",
-                f"*Время работы:* {int(hours)}ч {int(minutes)}м {int(seconds)}с\n",
-                f"*Последнее сканирование:* {self.last_scan_time.strftime('%H:%M:%S') if self.last_scan_time else 'Никогда'}\n",
-                f"*Успешных сканирований:* {self.successful_scans}\n",
-                f"*Отправлено сигналов:* {self.signals_sent}\n",
-                f"*Ошибок:* {self.errors_count}\n",
-                f"*Статус:* {'🟢 РАБОТАЕТ' if self.is_running else '🔴 ОСТАНОВЛЕН'}\n",
-                f"*Следующее сканирование:* через {self.config.SCAN_INTERVAL} сек\n",
-                f"*Мониторинг токенов:* {self.config.MAX_SYMBOLS}\n",
-                f"*Риск на сделку:* {self.config.RISK_PER_TRADE}%\n",
-                "\n_Отчет сгенерирован автоматически_"
-            )
+            message = "\n".join([
+                "🤖 *ОТЧЕТ О СОСТОЯНИИ БОТА*",
+                "",
+                f"*Время работы:* {int(hours)}ч {int(minutes)}м {int(seconds)}с",
+                f"*Последнее сканирование:* {self.last_scan_time.strftime('%H:%M:%S') if self.last_scan_time else 'Никогда'}",
+                f"*Успешных сканирований:* {self.successful_scans}",
+                f"*Отправлено сигналов:* {self.signals_sent}",
+                f"*Ошибок:* {self.errors_count}",
+                f"*Статус:* {'🟢 РАБОТАЕТ' if self.is_running else '🔴 ОСТАНОВЛЕН'}",
+                "",
+                f"*Следующее сканирование:* через {self.config.SCAN_INTERVAL} сек",
+                f"*Мониторинг токенов:* {self.config.MAX_SYMBOLS}",
+                f"*Риск на сделку:* {self.config.RISK_PER_TRADE}%",
+            ])
             
-            await self.send_telegram_message("".join(message), parse_mode='MarkdownV2')
+            await self.send_telegram_message(message)
             logger.info("Отправлен отчет о состоянии бота")
             
         except Exception as e:
@@ -998,9 +980,6 @@ class AlphaFuturesScanner:
         logger.info("Получена команда остановки бота...")
         self.is_running = False
 
-# Применяем декоратор после определения класса
-AlphaFuturesScanner = add_advanced_checklist_to_bot(AlphaFuturesScanner)
-
 def setup_signal_handlers(bot: AlphaFuturesScanner):
     """Настройка обработчиков сигналов для graceful shutdown"""
     def signal_handler(signum, frame):
@@ -1045,21 +1024,16 @@ if __name__ == "__main__":
     if not os.getenv('TELEGRAM_BOT_TOKEN') or not os.getenv('TELEGRAM_CHAT_ID'):
         print("❌ Ошибка: Не заданы TELEGRAM_BOT_TOKEN или TELEGRAM_CHAT_ID")
         print("\n📝 Инструкция по настройке:")
-        print("1. Создайте файл .env в корне проекта\n")
-        print("2. Заполните его по примеру .env.example\n")
-        print("3. Получите TELEGRAM_BOT_TOKEN у @BotFather\n")
-        print("4. Получите TELEGRAM_CHAT_ID у @userinfobot\n")
+        print("1. Создайте файл .env в корне проекта")
+        print("2. Заполните его по примеру .env.example")
+        print("3. Получите TELEGRAM_BOT_TOKEN у @BotFather")
+        print("4. Получите TELEGRAM_CHAT_ID у @userinfobot")
         print("\n⚡ Быстрый старт:")
-        print("   pip install -r requirements.txt\n")
-        print("   cp .env.example .env\n")
-        print("   # отредактируйте .env файл\n")
-        print("   python alpha_futures_scanner.py\n")
+        print("   pip install -r requirements.txt")
+        print("   cp .env.example .env")
+        print("   # отредактируйте .env файл")
+        print("   python alpha_futures_scanner.py")
         sys.exit(1)
-    
-    # Удалить повреждённый файл (один раз)
-    if os.path.exists('trade_history.json'):
-        os.remove('trade_history.json')
-        logger.info("\nУдалён повреждённый trade_history.json")
     
     # Запуск бота
     asyncio.run(main())

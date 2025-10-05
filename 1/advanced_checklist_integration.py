@@ -89,8 +89,7 @@ async def integrate_advanced_checklist(main_bot, symbol: str, data: Dict, indica
         # 📊 Расчет общего score
         advanced_score, detailed_scores = calculate_advanced_score(advanced_results)
         
-        # Минимальный проходной балл - 60%
-        passed = advanced_score >= 0.60
+        passed = advanced_score >= 0.40
         
         logger.info(f"Расширенный чеклист для {symbol}: score = {advanced_score:.2f}, пройдено = {passed}")
         
@@ -110,36 +109,24 @@ def add_advanced_checklist_to_bot(main_bot_class):
     """Добавление методов расширенного чеклиста в основной класс бота"""
     
     async def run_comprehensive_checklist(self, symbol: str, data: Dict, indicators: Dict) -> Tuple[bool, float, Dict]:
-        """Комплексный чеклист (базовый + расширенный)"""
+        """Комплексный чеклист (только базовый, без advanced для упрощения)"""
         
         # Запускаем базовый чеклист
         basic_passed, basic_score, basic_results = await self.run_enhanced_checklist(symbol, data, indicators)
         
-        # Запускаем расширенный чеклист
-        advanced_passed, advanced_score, advanced_results = await integrate_advanced_checklist(
-            self, symbol, data, indicators
-        )
-        
-        # Комбинированный score (70% базовый + 30% расширенный)
-        combined_score = (basic_score * 0.7) + (advanced_score * 0.3)
-        
-        # Комбинированное решение
-        combined_passed = combined_score >= 0.65
+        # Игнорируем advanced, используем только basic
+        combined_passed = basic_passed  # Или basic_score >= 0.50, если хотите порог
+        combined_score = basic_score
         
         logger.info(f"Комплексный чеклист для {symbol}: "
-                   f"базовый = {basic_score:.2f}, расширенный = {advanced_score:.2f}, "
-                   f"итоговый = {combined_score:.2f}, пройдено = {combined_passed}")
+                f"базовый = {basic_score:.2f}, "
+                f"итоговый = {combined_score:.2f}, пройдено = {combined_passed}")
         
         return combined_passed, combined_score, {
             'basic_checklist': {
                 'passed': basic_passed,
                 'score': basic_score,
                 'results': basic_results
-            },
-            'advanced_checklist': {
-                'passed': advanced_passed,
-                'score': advanced_score,
-                'results': advanced_results
             },
             'combined_score': combined_score
         }

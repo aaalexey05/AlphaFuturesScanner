@@ -6,11 +6,12 @@
 
 import numpy as np
 import pandas as pd
+import time
 from datetime import datetime
 from typing import Dict, List, Any, Tuple
 import logging
 import asyncio
-from pybit.unified_trading import HTTP  # Предполагаем, что у нас есть асинхронный клиент, если нет - адаптируем ниже
+from pybit.unified_trading import HTTP
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +20,35 @@ class AdvancedChecklist:
     
     def __init__(self, bybit_client: HTTP):
         self.bybit_client = bybit_client
+        self.kline_cache = {}  # Кэш для данных свечей
+        self.orderbook_cache = {}  # Кэш для ордербука
+        self.cache_timeout = 300  # 5 минут
+
+    async def _get_kline(self, symbol: str, interval: str, limit: int) -> List:
+        """Получение данных свечей с кэшированием"""
+        cache_key = f"{symbol}_{interval}_{limit}"
+        current_time = time.time()
+        if cache_key in self.kline_cache:
+            cached_data, timestamp = self.kline_cache[cache_key]
+            if current_time - timestamp < self.cache_timeout:
+                return cached_data
+        response = self.bybit_client.get_kline(category="linear", symbol=symbol, interval=interval, limit=limit)
+        klines = response['result']['list']
+        self.kline_cache[cache_key] = (klines, current_time)
+        return klines
+    
+    async def _get_orderbook(self, symbol: str, limit: int = 50) -> Dict:
+        """Получение ордербука с кэшированием"""
+        cache_key = f"{symbol}_orderbook_{limit}"
+        current_time = time.time()
+        if cache_key in self.orderbook_cache:
+            cached_data, timestamp = self.orderbook_cache[cache_key]
+            if current_time - timestamp < self.cache_timeout:
+                return cached_data
+        response = self.bybit_client.get_orderbook(category="linear", symbol=symbol, limit=limit)
+        orderbook = response['result']
+        self.orderbook_cache[cache_key] = (orderbook, current_time)
+        return orderbook
     
     # 🔍 Технический анализ (расширенный)
     
@@ -47,8 +77,7 @@ class AdvancedChecklist:
                 if is_bullish:
                     bullish_count += 1
             
-            # Как минимум 75% таймфреймов должны быть бычьими
-            passed = (bullish_count / total_timeframes) >= 0.75
+            passed = (bullish_count / total_timeframes) >= 0.50
             
             return passed, {
                 'bullish_count': bullish_count,
@@ -63,13 +92,7 @@ class AdvancedChecklist:
     async def _check_single_timeframe(self, symbol: str, tf_code: str, tf_name: str) -> bool:
         """Вспомогательный метод для проверки одного таймфрейма"""
         try:
-            kline_response = self.bybit_client.get_kline(
-                category="linear",
-                symbol=symbol,
-                interval=tf_code,
-                limit=50
-            )
-            klines = kline_response['result']['list']
+            klines = await self._get_kline(symbol, tf_code, 50)
             if not klines:
                 return False
             return self._is_timeframe_bullish(klines)
@@ -207,6 +230,14 @@ class AdvancedChecklist:
             if not bids or not asks:
                 return False, {'error': 'Нет данных стакана'}
             
+            # Проверка валидности данных
+            for bid in bids:
+                if not isinstance(bid, list) or len(bid) < 2 or not all(isinstance(x, (str, float, int)) for x in bid):
+                    return False, {'error': 'Некорректный формат данных бидов'}
+            for ask in asks:
+                if not isinstance(ask, list) or len(ask) < 2 or not all(isinstance(x, (str, float, int)) for x in ask):
+                    return False, {'error': 'Некорректный формат данных асков'}
+            
             # Анализируем объемы вблизи текущей цены
             price_range = 0.02  # ±2% от текущей цены
             lower_bound = current_price * (1 - price_range)
@@ -269,15 +300,20 @@ class AdvancedChecklist:
             tasks = []
             for tf_code, min_rsi, max_rsi in timeframes:
                 task = asyncio.create_task(self._check_single_rsi(symbol, tf_code, min_rsi, max_rsi))
-                tasks.append((task, tf_code))
+                tasks.append((task, tf_code, min_rsi, max_rsi))
             
-            for task, tf_code in tasks:
-                passed, rsi, details = await task
-                results[tf_code] = details
+            for task, tf_code, min_rsi, max_rsi in tasks:
+                rsi, passed = await task
+                results[tf_code] = {
+                    'passed': passed,
+                    'rsi': rsi,
+                    'min_rsi': min_rsi,
+                    'max_rsi': max_rsi
+                }
                 if passed:
                     passed_timeframes += 1
             
-            # Как минимум 2 из 3 ТФ должны соответствовать
+            # Требуется, чтобы хотя бы 2/3 таймфреймов прошли проверку
             passed = passed_timeframes >= 2
             
             return passed, {
@@ -287,123 +323,70 @@ class AdvancedChecklist:
             }
             
         except Exception as e:
-            logger.error(f"Ошибка проверки RSI на нескольких ТФ: {e}")
+            logger.error(f"Ошибка проверки RSI на ТФ: {e}")
             return False, {'error': str(e)}
     
-    async def _check_single_rsi(self, symbol: str, tf_code: str, min_rsi: float, max_rsi: float) -> Tuple[bool, float, Dict]:
-        """Вспомогательный метод для проверки RSI одного таймфрейма"""
+    async def _check_single_rsi(self, symbol: str, tf_code: str, min_rsi: float, max_rsi: float) -> Tuple[float, bool]:
+        """Проверка RSI на одном таймфрейме"""
         try:
-            kline_response = self.bybit_client.get_kline(
-                category="linear",
-                symbol=symbol,
-                interval=tf_code,
-                limit=100
-            )
-            klines = kline_response['result']['list']
-            if not klines:
-                return False, 50, {'passed': False, 'rsi': 50, 'error': 'Нет данных'}
-            
+            klines = await self._get_kline(symbol, tf_code, 30)
+            if len(klines) < 15:
+                return 50, False
             closes = [float(k[4]) for k in klines]
             rsi = self._calculate_rsi(closes)
             passed = min_rsi <= rsi <= max_rsi
-            return passed, rsi, {
-                'passed': passed,
-                'rsi': rsi,
-                'min_rsi': min_rsi,
-                'max_rsi': max_rsi
-            }
+            return rsi, passed
         except Exception as e:
-            logger.warning(f"Ошибка RSI на ТФ {tf_code}: {e}")
-            return False, 50, {'passed': False, 'rsi': 50, 'error': str(e)}
+            logger.warning(f"Ошибка получения RSI для {symbol} на ТФ {tf_code}: {e}")
+            return 50, False
     
     async def check_stochastic_momentum(self, klines: List) -> Tuple[bool, Dict]:
-        """Анализ стохастического осциллятора"""
+        """Проверка стохастического моментума"""
         try:
             if len(klines) < 20:
                 return False, {'error': 'Недостаточно данных'}
             
-            highs = [float(k[2]) for k in klines]
-            lows = [float(k[3]) for k in klines]
-            closes = [float(k[4]) for k in klines]
+            closes = [float(k[4]) for k in klines[-20:]]
+            highs = [float(k[2]) for k in klines[-20:]]
+            lows = [float(k[3]) for k in klines[-20:]]
             
-            # Расчет %K (стохастик)
-            period = 14
-            smoothing = 3
+            current_price = closes[-1]
+            highest_high = max(highs[-14:])
+            lowest_low = min(lows[-14:])
             
-            stoch_k = []
-            for i in range(period, len(closes)):
-                high_max = max(highs[i-period:i])
-                low_min = min(lows[i-period:i])
-                current_close = closes[i]
-                
-                if high_max != low_min:
-                    k_value = 100 * (current_close - low_min) / (high_max - low_min)
-                    stoch_k.append(k_value)
+            k_value = 100 * (current_price - lowest_low) / (highest_high - lowest_low) if highest_high != lowest_low else 50
+            d_value = np.mean([100 * (closes[i] - min(lows[i-14:i])) / (max(highs[i-14:i]) - min(lows[i-14:i])) 
+                              for i in range(-3, 0)] if max(highs[-14:]) != min(lows[-14:]) else [50])
             
-            if len(stoch_k) < smoothing:
-                return False, {'error': 'Недостаточно данных для расчета'}
-            
-            # Сглаживание %K для получения %D
-            stoch_d = []
-            for i in range(smoothing-1, len(stoch_k)):
-                d_value = np.mean(stoch_k[i-smoothing+1:i+1])
-                stoch_d.append(d_value)
-            
-            if not stoch_k or not stoch_d:
-                return False, {'error': 'Ошибка расчета стохастика'}
-            
-            current_k = stoch_k[-1]
-            current_d = stoch_d[-1]
-            
-            # Бычьи условия:
-            # 1. %K выше %D
-            # 2. Оба вышли из зоны перепроданности (<20)
-            # 3. Находятся в зоне накопления (20-80)
-            k_above_d = current_k > current_d
-            out_of_oversold = current_k > 20 and current_d > 20
-            in_accumulation = 20 <= current_k <= 80
+            k_above_d = k_value > d_value
+            out_of_oversold = k_value > 20
+            in_accumulation = 20 < k_value < 80
             
             passed = k_above_d and out_of_oversold and in_accumulation
             
             return passed, {
-                'k_value': current_k,
-                'd_value': current_d,
+                'k_value': k_value,
+                'd_value': d_value,
                 'k_above_d': k_above_d,
                 'out_of_oversold': out_of_oversold,
                 'in_accumulation': in_accumulation
             }
             
         except Exception as e:
-            logger.error(f"Ошибка анализа стохастика: {e}")
+            logger.error(f"Ошибка проверки стохастического моментума: {e}")
             return False, {'error': str(e)}
     
-    # 🏛️ Фундаментальные и рыночные факторы
-    
     async def check_market_cap_volume(self, symbol: str) -> Tuple[bool, Dict]:
-        """Анализ соотношения объема и капитализации"""
+        """Проверка рыночной капитализации и объема"""
         try:
-            ticker_response = self.bybit_client.get_tickers(
-                category="linear",
-                symbol=symbol
-            )
+            ticker = self.bybit_client.get_tickers(category="linear", symbol=symbol)
+            volume_24h = float(ticker['result']['list'][0]['volume24h'])
+            turnover_24h = float(ticker['result']['list'][0]['turnover24h'])
+            avg_trade_size = turnover_24h / volume_24h if volume_24h != 0 else 0
             
-            if not ticker_response['result']['list']:
-                return False, {'error': 'Нет данных тикера'}
-            
-            ticker_data = ticker_response['result']['list'][0]
-            volume_24h = float(ticker_data.get('volume24h', 0))
-            turnover_24h = float(ticker_data.get('turnover24h', 0))
-            
-            if volume_24h == 0:
-                return False, {'error': 'Нулевой объем'}
-            
-            # Отношение оборота к объему (средняя цена сделки)
-            avg_trade_size = turnover_24h / volume_24h if volume_24h > 0 else 0
-            
-            # Проверяем ликвидность и значимость токена
-            sufficient_volume = volume_24h > 100000  # Минимум 100k контрактов
-            sufficient_turnover = turnover_24h > 1000000  # Минимум 1M USDT оборота
-            reasonable_avg_trade = 100 <= avg_trade_size <= 10000  # Разумный размер сделки
+            sufficient_volume = volume_24h > 1000000
+            sufficient_turnover = turnover_24h > 100000  # Снижено с более высокого значения
+            reasonable_avg_trade = avg_trade_size > 0.01 if avg_trade_size != 0 else False
             
             passed = sufficient_volume and sufficient_turnover and reasonable_avg_trade
             
@@ -417,167 +400,91 @@ class AdvancedChecklist:
             }
             
         except Exception as e:
-            logger.error(f"Ошибка анализа капитализации: {e}")
+            logger.error(f"Ошибка проверки рыночной капитализации: {e}")
             return False, {'error': str(e)}
     
     async def check_relative_volatility(self, symbol: str, current_atr: float, current_price: float) -> Tuple[bool, Dict]:
-        """Анализ волатильности относительно BTC"""
+        """Проверка относительной волатильности"""
         try:
-            # Получаем данные BTC для сравнения
-            btc_data = self.bybit_client.get_kline(category="linear",
-                symbol='BTCUSDT',
-                interval='15',
-                limit=100
-            )
+            if current_price == 0 or current_atr == 0:
+                return False, {'error': 'Недостаточно данных'}
             
-            if not btc_data['result']['list']:
-                return True, {'error': 'Нет данных BTC', 'assume_ok': True}
-            
-            btc_klines = btc_data['result']['list']
+            btc_ticker = self.bybit_client.get_tickers(category="linear", symbol="BTCUSDT")
+            btc_price = float(btc_ticker['result']['list'][0]['lastPrice'])
+            btc_klines = await self._get_kline("BTCUSDT", "15", 14)
             btc_closes = [float(k[4]) for k in btc_klines]
-            btc_highs = [float(k[2]) for k in btc_klines]
-            btc_lows = [float(k[3]) for k in btc_klines]
+            btc_atr = np.mean([abs(float(k[2]) - float(k[3])) for k in btc_klines])
             
-            # Расчет ATR для BTC
-            btc_atr = self._calculate_atr(btc_highs, btc_lows, btc_closes)
-            btc_price = btc_closes[-1] if btc_closes else current_price
-            
-            if btc_atr == 0 or btc_price == 0:
-                return True, {'error': 'Ошибка расчета BTC ATR', 'assume_ok': True}
-            
-            # Процентные ATR
             symbol_atr_percent = (current_atr / current_price) * 100
-            btc_atr_percent = (btc_atr / btc_price) * 100
+            btc_atr_percent = (btc_atr / btc_price) * 100 if btc_price != 0 else 0
+            volatility_ratio = symbol_atr_percent / btc_atr_percent if btc_atr_percent != 0 else float('inf')
             
-            if btc_atr_percent == 0:
-                return True, {'error': 'Нулевая волатильность BTC', 'assume_ok': True}
-            
-            # Относительная волатильность
-            relative_volatility = symbol_atr_percent / btc_atr_percent
-            
-            # Приемлемый диапазон: 0.5x - 2.0x от волатильности BTC
-            passed = 0.5 <= relative_volatility <= 2.0
+            passed = 0.5 <= volatility_ratio <= 2.0
             
             return passed, {
                 'symbol_atr_percent': symbol_atr_percent,
                 'btc_atr_percent': btc_atr_percent,
-                'relative_volatility': relative_volatility,
-                'volatility_ratio': relative_volatility
+                'relative_volatility': volatility_ratio,
+                'volatility_ratio': volatility_ratio
             }
             
         except Exception as e:
-            logger.error(f"Ошибка анализа относительной волатильности: {e}")
-            return True, {'error': str(e), 'assume_ok': True}
+            logger.error(f"Ошибка проверки относительной волатильности: {e}")
+            return False, {'error': str(e)}
     
-    def _calculate_atr(self, highs: List[float], lows: List[float], closes: List[float], period: int = 14) -> float:
-        """Расчет Average True Range"""
-        if len(highs) < period or len(lows) < period or len(closes) < period:
-            return 0
-        
-        true_ranges = []
-        for i in range(1, len(highs)):
-            high_low = highs[i] - lows[i]
-            high_close = abs(highs[i] - closes[i-1])
-            low_close = abs(lows[i] - closes[i-1])
-            
-            true_range = max(high_low, high_close, low_close)
-            true_ranges.append(true_range)
-        
-        if len(true_ranges) < period:
-            return 0
-        
-        atr = np.mean(true_ranges[-period:])
-        return atr
-    
-    # ⏰ Временные и сезонные факторы
-    
+    # ⏰ Временные факторы    
     async def check_trading_session(self) -> Tuple[bool, Dict]:
-        """Анализ оптимального времени для торговли"""
+        """Проверка текущей торговой сессии"""
         try:
-            now = datetime.now()
-            current_hour = now.hour
-            current_weekday = now.weekday()
-            current_minute = now.minute
+            now = datetime.utcnow()
+            hour = now.hour
+            day = now.weekday()
             
-            # Избегаем выходных
-            if current_weekday >= 5:  # Суббота, воскресенье
-                return False, {
-                    'session': 'weekend',
-                    'optimal': False,
-                    'reason': 'Выходные - низкая ликвидность'
-                }
+            if day >= 5:  # Суббота/Воскресенье
+                return True, {'session': 'weekend', 'optimal': True, 'low_volatility': False}  # Упрощение: passed=True
             
-            # Определяем торговые сессии (UTC)
-            sessions = {
-                'asian': (0, 8),      # Азиатская сессия
-                'european': (8, 16),  # Европейская сессия  
-                'american': (16, 24)  # Американская сессия
-            }
+            # Определяем торговую сессию
+            if 0 <= hour < 8:
+                session = 'asian'
+                optimal = False
+                low_volatility = True
+            elif 8 <= hour < 16:
+                session = 'european'
+                optimal = True
+                low_volatility = False
+            else:
+                session = 'american'
+                optimal = True
+                low_volatility = False
             
-            current_session = None
-            for session, (start, end) in sessions.items():
-                if start <= current_hour < end:
-                    current_session = session
-                    break
-            
-            # Наиболее оптимальные периоды:
-            # - Начало европейской сессии (8-10 UTC)
-            # - Перекрытие европейской и американской (14-16 UTC)
-            # - Начало американской сессии (16-18 UTC)
-            optimal_periods = [
-                (8, 10),   # Начало Европы
-                (14, 16),  # Перекрытие Европа/Америка
-                (16, 18)   # Начало Америки
-            ]
-            
-            in_optimal_period = any(start <= current_hour < end for start, end in optimal_periods)
-            
-            # Избегаем первых и последних минут часа (волатильность из-за закрытия свечей)
-            avoid_volatile_minutes = current_minute <= 5 or current_minute >= 55
-            
-            passed = in_optimal_period and not avoid_volatile_minutes
-            
+            passed = optimal
             return passed, {
-                'current_session': current_session,
-                'current_hour': current_hour,
-                'current_minute': current_minute,
-                'in_optimal_period': in_optimal_period,
-                'avoid_volatile_minutes': avoid_volatile_minutes,
-                'optimal_periods': optimal_periods
+                'session': session,
+                'optimal': optimal,
+                'low_volatility': low_volatility
             }
             
         except Exception as e:
-            logger.error(f"Ошибка анализа торговой сессии: {e}")
+            logger.error(f"Ошибка проверки торговой сессии: {e}")
             return True, {'error': str(e), 'assume_ok': True}
     
     async def check_seasonal_pattern(self) -> Tuple[bool, Dict]:
-        """Анализ сезонных паттернов"""
+        """Проверка сезонных паттернов"""
         try:
-            now = datetime.now()
-            current_month = now.month
-            current_day = now.day
-            current_weekday = now.weekday()
+            current_time = datetime.now()
+            current_month = current_time.month
+            current_day = current_time.day
+            current_weekday = current_time.weekday()
             
-            # Известные бычьи периоды:
-            bullish_months = [1, 4, 10, 11]  # Январь, апрель, октябрь, ноябрь
-            bearish_months = [2, 6, 9]       # Февраль, июнь, сентябрь
+            bullish_months = [1, 4, 10, 11]
+            bearish_months = [2, 6, 9]
             
-            # Эффекты начала/конца месяца
-            month_end_effect = current_day >= 25 or current_day <= 7
-            
-            # Эффект "первого дня месяца"
-            first_week_effect = current_day <= 7
-            
-            # Пятничный эффект (профит-тейкинг перед выходными)
-            friday_effect = current_weekday == 4  # Пятница
-            
-            # Бычьи условия:
             month_positive = current_month in bullish_months
             month_neutral = current_month not in bearish_months
-            timing_positive = month_end_effect or first_week_effect
-            avoid_friday = not friday_effect
+            timing_positive = 9 <= current_time.hour <= 20
+            avoid_friday = current_weekday != 4
             
-            passed = (month_positive or (month_neutral and timing_positive)) and avoid_friday
+            passed = month_positive and month_neutral and timing_positive and avoid_friday
             
             return passed, {
                 'current_month': current_month,
@@ -591,37 +498,21 @@ class AdvancedChecklist:
             }
             
         except Exception as e:
-            logger.error(f"Ошибка анализа сезонности: {e}")
+            logger.error(f"Ошибка проверки сезонных паттернов: {e}")
             return True, {'error': str(e), 'assume_ok': True}
     
     # 🎯 Психологические уровни
     
     async def check_psychological_levels(self, current_price: float) -> Tuple[bool, Dict]:
-        """Анализ психологических ценовых уровней"""
+        """Проверка психологических уровней"""
         try:
             if current_price <= 0:
-                return False, {'error': 'Некорректная цена'}
+                return False, {'error': 'Недопустимая цена'}
             
-            # Определяем порядок цены для выбора соответствующих уровней
-            price_order = 10 ** (np.floor(np.log10(current_price)))
-            
-            # Основные психологические уровни
-            if current_price < 1:
-                levels = [0.001, 0.005, 0.01, 0.05, 0.1, 0.5]
-            elif current_price < 10:
-                levels = [1, 2, 5, 10]
-            elif current_price < 100:
-                levels = [10, 20, 50, 100]
-            elif current_price < 1000:
-                levels = [100, 200, 500, 1000]
-            else:
-                levels = [1000, 2000, 5000, 10000, 20000, 50000]
-            
-            # Находим ближайшие уровни
+            levels = [0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1, 5, 10, 50, 100]
             distances = [abs(current_price - level) for level in levels]
-            min_distance = min(distances) if distances else current_price
-            nearest_level = levels[distances.index(min_distance)] if distances else 0
-            # Процентное расстояние до ближайшего уровня
+            min_distance = min(distances)
+            nearest_level = levels[distances.index(min_distance)]
             distance_percent = (min_distance / current_price) * 100
             
             # Должны быть достаточно далеко от психологических уровней (>0.5%)
@@ -637,7 +528,7 @@ class AdvancedChecklist:
             
         except Exception as e:
             logger.error(f"Ошибка анализа психологических уровней: {e}")
-            return True, {'error': str(e), 'assume_ok': True}
+            return False, {'error': str(e)}
     
     async def check_large_orders_clusters(self, orderbook: Dict, current_price: float) -> Tuple[bool, Dict]:
         """Анализ скоплений крупных ордеров"""
@@ -648,10 +539,17 @@ class AdvancedChecklist:
             if not bids or not asks:
                 return False, {'error': 'Нет данных стакана'}
             
+            # Проверка валидности данных
+            for bid in bids:
+                if not isinstance(bid, list) or len(bid) < 2 or not all(isinstance(x, (str, float, int)) for x in bid):
+                    return False, {'error': 'Некорректный формат данных бидов'}
+            for ask in asks:
+                if not isinstance(ask, list) or len(ask) < 2 or not all(isinstance(x, (str, float, int)) for x in ask):
+                    return False, {'error': 'Некорректный формат данных асков'}
+            
             # Порог для крупных ордеров (в USDT)
             large_order_threshold = 10000
             
-            # Анализируем крупные ордера в стакане
             large_bids = 0
             large_asks = 0
             
@@ -669,7 +567,6 @@ class AdvancedChecklist:
                 if order_size >= large_order_threshold:
                     large_asks += 1
             
-            # Баланс крупных ордеров
             total_large_orders = large_bids + large_asks
             if total_large_orders == 0:
                 return True, {
@@ -682,7 +579,6 @@ class AdvancedChecklist:
             
             order_imbalance = (large_bids - large_asks) / total_large_orders
             
-            # Преимущество крупных покупателей
             passed = order_imbalance > 0
             
             return passed, {
@@ -695,7 +591,7 @@ class AdvancedChecklist:
             
         except Exception as e:
             logger.error(f"Ошибка анализа крупных ордеров: {e}")
-            return True, {'error': str(e), 'assume_ok': True}
+            return False, {'error': str(e)}
     
     # 🔄 Корреляционный анализ
     
@@ -708,20 +604,10 @@ class AdvancedChecklist:
             if len(klines) < 50:
                 return True, {'error': 'Недостаточно данных', 'assume_ok': True}
             
-            # Получаем данные BTC за тот же период
-            btc_response = self.bybit_client.get_kline(
-                category="linear",
-                symbol='BTCUSDT',
-                interval='15',
-                limit=len(klines)
-            )
-            
-            if not btc_response['result']['list']:
+            btc_klines = await self._get_kline('BTCUSDT', '15', len(klines))
+            if not btc_klines:
                 return True, {'error': 'Нет данных BTC', 'assume_ok': True}
             
-            btc_klines = btc_response['result']['list']
-            
-            # Приводим к одинаковой длине
             min_length = min(len(klines), len(btc_klines))
             symbol_closes = [float(k[4]) for k in klines[-min_length:]]
             btc_closes = [float(k[4]) for k in btc_klines[-min_length:]]
@@ -729,19 +615,15 @@ class AdvancedChecklist:
             if len(symbol_closes) < 30:
                 return True, {'error': 'Недостаточно данных для корреляции', 'assume_ok': True}
             
-            # Рассчитываем корреляцию
             correlation = np.corrcoef(symbol_closes, btc_closes)[0, 1]
             
             if np.isnan(correlation):
                 return True, {'error': 'Ошибка расчета корреляции', 'assume_ok': True}
             
-            # Идеальная корреляция для альткоинов: 0.3-0.7
-            # Слишком низкая - нет связи с рынком
-            # Слишком высокая - нет альфа (двигается как BTC)
             passed = 0.3 <= correlation <= 0.7
             
             return passed, {
-                'correlation': correlation,
+                'correlation': float(correlation),  # Конвертация numpy.float64
                 'data_points': len(symbol_closes),
                 'correlation_strength': self._get_correlation_strength(correlation)
             }
@@ -770,7 +652,6 @@ class AdvancedChecklist:
             
             closes = [float(k[4]) for k in klines]
             
-            # Рассчитываем логарифмические доходности
             returns = []
             for i in range(1, len(closes)):
                 ret = np.log(closes[i] / closes[i-1])
@@ -779,27 +660,23 @@ class AdvancedChecklist:
             if not returns:
                 return True, {'error': 'Не удалось рассчитать доходности', 'assume_ok': True}
             
-            # Расчет VaR (параметрический метод)
             mean_return = np.mean(returns)
             std_return = np.std(returns)
             
-            # Z-score для доверительного уровня
             from scipy import stats
             z_score = stats.norm.ppf(1 - confidence_level)
             
-            # Однодневный VaR
             var_1d = abs(mean_return + z_score * std_return)
             
-            # Приемлемый риск: не более 5% за день
             max_acceptable_var = 0.05
             passed = var_1d <= max_acceptable_var
             
             return passed, {
-                'var_1d': var_1d,
-                'var_1d_percent': var_1d * 100,
+                'var_1d': float(var_1d),  # Конвертация numpy.float64
+                'var_1d_percent': float(var_1d * 100),
                 'confidence_level': confidence_level,
-                'mean_return': mean_return,
-                'std_return': std_return,
+                'mean_return': float(mean_return),
+                'std_return': float(std_return),
                 'max_acceptable_var': max_acceptable_var
             }
             
@@ -815,7 +692,6 @@ class AdvancedChecklist:
             
             closes = [float(k[4]) for k in klines]
             
-            # Расчет максимальной просадки
             peak = closes[0]
             max_drawdown = 0
             drawdowns = []
@@ -828,14 +704,13 @@ class AdvancedChecklist:
                 if drawdown > max_drawdown:
                     max_drawdown = drawdown
             
-            # Приемлемая просадка: не более 25%
             max_acceptable_drawdown = 0.25
             passed = max_drawdown <= max_acceptable_drawdown
             
             return passed, {
-                'max_drawdown': max_drawdown,
-                'max_drawdown_percent': max_drawdown * 100,
-                'current_drawdown': drawdowns[-1] if drawdowns else 0,
+                'max_drawdown': float(max_drawdown),  # Конвертация numpy.float64
+                'max_drawdown_percent': float(max_drawdown * 100),
+                'current_drawdown': float(drawdowns[-1] if drawdowns else 0),
                 'max_acceptable_drawdown': max_acceptable_drawdown,
                 'data_points': len(closes)
             }
@@ -849,29 +724,18 @@ class AdvancedChecklist:
 def get_advanced_checklist_weights() -> Dict[str, float]:
     """Веса для расширенного чеклиста"""
     return {
-        # Технический анализ
         'multi_timeframe_alignment': 0.08,
         'rsi_divergence': 0.06,
         'volume_clusters': 0.05,
         'multi_timeframe_rsi': 0.06,
         'stochastic_momentum': 0.05,
-        
-        # Фундаментальные факторы
         'market_cap_volume': 0.05,
         'relative_volatility': 0.04,
-        
-        # Временные факторы
         'trading_session': 0.04,
         'seasonal_pattern': 0.03,
-        
-        # Психологические уровни
         'psychological_levels': 0.04,
         'large_orders_clusters': 0.04,
-        
-        # Корреляционный анализ
         'correlation_with_btc': 0.05,
-        
-        # Управление рисками
         'var_risk': 0.03,
         'max_drawdown': 0.03
     }
@@ -883,8 +747,19 @@ def calculate_advanced_score(check_results: Dict) -> Tuple[float, Dict]:
         total_score = 0
         detailed_scores = {}
         
-        for check_name, result in check_results.items():
-            weight = weights.get(check_name, 0)
+        for check_name in weights:
+            if check_name not in check_results:
+                logger.warning(f"Отсутствует результат для проверки {check_name}")
+                detailed_scores[check_name] = {
+                    'weight': weights[check_name],
+                    'passed': False,
+                    'score': 0,
+                    'details': {'error': 'Результат не найден'}
+                }
+                continue
+            
+            result = check_results[check_name]
+            weight = weights[check_name]
             passed = result.get('passed', False)
             score = weight if passed else 0
             total_score += score
@@ -895,7 +770,7 @@ def calculate_advanced_score(check_results: Dict) -> Tuple[float, Dict]:
                 'details': result.get('details', {})
             }
         
-        return total_score, detailed_scores
+        return float(total_score), detailed_scores  # Конвертация numpy.float64
         
     except Exception as e:
         logger.error(f"Ошибка расчета расширенного score: {e}")
