@@ -572,7 +572,7 @@ class AlphaFuturesScanner:
                     total_score += weights.get(check_name, 0)
             
             signal_strength = self.determine_signal_strength(total_score)
-            passed = total_score >= 0.6
+            passed = total_score >= 0.70
             signal_direction = "Long" if self.check_trend_alignment(indicators) else "Short"
             
             logger.info(
@@ -736,7 +736,13 @@ class AlphaFuturesScanner:
             
             if checklist_passed:
                 entry_price = indicators['current_price']
-                stop_loss = entry_price * 0.98
+                # Устанавливаем стоп-лосс и тейк-профит в зависимости от направления
+                if signal_direction == "Long":
+                    stop_loss = entry_price * 0.98  # 2% ниже для Long
+                    take_profit = entry_price * 1.06  # 6% выше для Long
+                else:  # Short
+                    stop_loss = entry_price * 1.02  # 2% выше для Short
+                    take_profit = entry_price * 0.94  # 6% ниже для Short
                 
                 position_info = await self.calculate_position_size(
                     symbol, entry_price, stop_loss
@@ -746,7 +752,7 @@ class AlphaFuturesScanner:
                     'symbol': symbol,
                     'entry_price': entry_price,
                     'stop_loss': stop_loss,
-                    'take_profit': entry_price * 1.06,
+                    'take_profit': take_profit,
                     'score': score,
                     'strength': self.determine_signal_strength(score),
                     'position_size': position_info['size'],
@@ -770,61 +776,75 @@ class AlphaFuturesScanner:
         except Exception as e:
             logger.error(f"Ошибка анализа {symbol}: {e}")
             self.errors_count += 1
+                
+        except Exception as e:
+            logger.error(f"Ошибка анализа {symbol}: {e}")
+            self.errors_count += 1
     
     async def send_trading_signal(self, signal: Dict, checklist_results: Dict, position_info: Dict):
-            """Отправка детализированного торгового сигнала"""
-            try:
-                strength_emoji = {
-                    SignalStrength.WEAK: "🟡",
-                    SignalStrength.MEDIUM: "🟢",
-                    SignalStrength.STRONG: "🔵",
-                    SignalStrength.VERY_STRONG: "🚀"
-                }
-                emoji = strength_emoji.get(signal['strength'], "📈")
-                
-                risk_percent = position_info.get('risk_percent', 0.0)
-                leverage_suggestion = position_info.get('leverage_suggestion', 0.0)
-                direction = signal.get('direction', 'Unknown')
-                
-                message_parts = [
-                    f"{emoji} *ТОРГОВЫЙ СИГНАЛ* {emoji}",
-                    f"*Токен:* `{signal['symbol']}`",
-                    f"*Направление:* {direction}",
-                    f"*Сила сигнала:* {signal['strength'].name.replace('_', ' ').title()} ({signal['score']:.1%})",
-                    "",
-                    "*🎯 Параметры входа:*",
-                    f"• Цена входа: `${signal['entry_price']:.4f}`",
-                    f"• Стоп-лосс: `${signal['stop_loss']:.4f}` (-{100*(1-signal['stop_loss']/signal['entry_price']):.1f}%)",
-                    f"• Тейк-профит: `${signal['take_profit']:.4f}` (+{100*(signal['take_profit']/signal['entry_price']-1):.1f}%)",
-                    f"• Риск/прибыль: 1:{((signal['take_profit']-signal['entry_price'])/(signal['entry_price']-signal['stop_loss'])):.1f}",
-                    "",
-                    "*📊 Параметры позиции:*",
-                    f"• Размер позиции: `{signal['position_size']:.2f} USDT`",
-                    f"• Сумма риска: `{signal['risk_amount']:.2f} USDT`",
-                    f"• Риск на сделку: `{risk_percent:.1f}%`",
-                    f"• Рекомендуемое плечо: `{leverage_suggestion:.0f}x`",
-                    "",
-                    "*✅ Результаты чеклиста:*"
-                ]
-                
-                for check_name, passed in checklist_results.items():
-                    status = "✅" if passed else "❌"
-                    message_parts.append(f"{status} {check_name}")
-                
-                message_parts.extend([
-                    "",
-                    f"*📈 Индикаторы:* RSI {signal['indicators'].get('rsi', 0):.1f}, "
-                    f"MACD {signal['indicators'].get('macd', 0):.4f}",
-                    f"*⏰ Время:* {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
-                    ""
-                ])
-                
-                message = "\n".join(message_parts)
-                await self.send_telegram_message(message)
-                logger.info(f"Торговый сигнал отправлен для {signal['symbol']}, направление: {direction}")
-            except Exception as e:
-                logger.error(f"Ошибка отправки сигнала для {signal['symbol']}: {e}")
-                self.errors_count += 1
+        """Отправка детализированного торгового сигнала"""
+        try:
+            strength_emoji = {
+                SignalStrength.WEAK: "🟡",
+                SignalStrength.MEDIUM: "🟢",
+                SignalStrength.STRONG: "🔵",
+                SignalStrength.VERY_STRONG: "🚀"
+            }
+            emoji = strength_emoji.get(signal['strength'], "📈")
+            
+            risk_percent = position_info.get('risk_percent', 0.0)
+            leverage_suggestion = position_info.get('leverage_suggestion', 0.0)
+            direction = signal.get('direction', 'Unknown')
+            
+            # Расчёт процентов для стоп-лосса и тейк-профита в зависимости от направления
+            if direction == "Long":
+                stop_loss_percent = 100 * (signal['stop_loss'] / signal['entry_price'] - 1)  # Отрицательный для Long
+                take_profit_percent = 100 * (signal['take_profit'] / signal['entry_price'] - 1)  # Положительный
+                risk_reward_ratio = (signal['take_profit'] - signal['entry_price']) / (signal['entry_price'] - signal['stop_loss'])
+            else:  # Short
+                stop_loss_percent = 100 * (signal['stop_loss'] / signal['entry_price'] - 1)  # Положительный
+                take_profit_percent = 100 * (1 - signal['take_profit'] / signal['entry_price'])  # Положительный
+                risk_reward_ratio = abs((signal['entry_price'] - signal['take_profit']) / (signal['stop_loss'] - signal['entry_price']))
+            
+            message_parts = [
+                f"{emoji} *ТОРГОВЫЙ СИГНАЛ* {emoji}",
+                f"*Токен:* [{signal['symbol']}](https://www.bybit.com/trade/usdt/{signal['symbol']})",
+                f"*Направление:* {direction}",
+                f"*Сила сигнала:* {signal['strength'].name.replace('_', ' ').title()} ({signal['score']:.1%})",
+                "",
+                "*🎯 Параметры входа:*",
+                f"• Цена входа: `${signal['entry_price']:.4f}`",
+                f"• Стоп-лосс: `${signal['stop_loss']:.4f}` ({stop_loss_percent:+.1f}%)",
+                f"• Тейк-профит: `${signal['take_profit']:.4f}` ({take_profit_percent:+.1f}%)",
+                f"• Риск/прибыль: 1:{risk_reward_ratio:.1f}",
+                "",
+                "*📊 Параметры позиции:*",
+                f"• Размер позиции: `{signal['position_size']:.2f} USDT`",
+                f"• Сумма риска: `{signal['risk_amount']:.2f} USDT`",
+                f"• Риск на сделку: `{risk_percent:.1f}%`",
+                f"• Рекомендуемое плечо: `{leverage_suggestion:.0f}x`",
+                "",
+                "*✅ Результаты чеклиста:*"
+            ]
+            
+            for check_name, passed in checklist_results.items():
+                status = "✅" if passed else "❌"
+                message_parts.append(f"{status} {check_name}")
+            
+            message_parts.extend([
+                "",
+                f"*📈 Индикаторы:* RSI {signal['indicators'].get('rsi', 0):.1f}, "
+                f"MACD {signal['indicators'].get('macd', 0):.4f}",
+                f"*⏰ Время:* {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+                ""
+            ])
+            
+            message = "\n".join(message_parts)
+            await self.send_telegram_message(message)
+            logger.info(f"Торговый сигнал отправлен для {signal['symbol']}, направление: {direction}")
+        except Exception as e:
+            logger.error(f"Ошибка отправки сигнала для {signal['symbol']}: {e}")
+            self.errors_count += 1
     
     async def send_health_report(self):
         """Отправка отчета о состоянии бота"""
@@ -860,37 +880,40 @@ class AlphaFuturesScanner:
             logger.info("Начинаем сканирование рынка...")
             start_time = time.time()
             
-            # Получаем и фильтруем символы
             all_symbols = await self.get_all_futures_symbols()
             filtered_symbols = await self.filter_symbols_by_liquidity(all_symbols)
             
             if not filtered_symbols:
                 logger.warning("Нет подходящих символов для анализа")
+                await self.send_telegram_message("⚠️ *Нет подходящих символов для анализа*")
                 return
             
             logger.info(f"Анализируем {len(filtered_symbols)} символов...")
             
-            # Анализируем каждый символ
             tasks = []
             for symbol in filtered_symbols:
                 task = asyncio.create_task(self.analyze_symbol(symbol))
                 tasks.append(task)
                 
-                # Ограничиваем количество одновременных запросов
                 if len(tasks) >= 5:
-                    await asyncio.gather(*tasks)
+                    await asyncio.gather(*tasks, return_exceptions=True)
                     tasks = []
                     await asyncio.sleep(0.1)
             
-            # Обрабатываем оставшиеся задачи
             if tasks:
-                await asyncio.gather(*tasks)
+                await asyncio.gather(*tasks, return_exceptions=True)
             
             self.last_scan_time = datetime.now()
             self.successful_scans += 1
             
             scan_duration = time.time() - start_time
             logger.info(f"Сканирование завершено за {scan_duration:.2f} секунд")
+            
+            # Отправка сообщения о завершении сканирования
+            scan_interval_minutes = self.config.SCAN_INTERVAL / 60
+            await self.send_telegram_message(
+                f"✅ *Сканирование завершено.* Следующее сканирование через {scan_interval_minutes:.0f} минут."
+            )
             
         except Exception as e:
             logger.error(f"Ошибка сканирования рынка: {e}")
