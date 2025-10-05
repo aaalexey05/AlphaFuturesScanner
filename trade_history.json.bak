@@ -14218,5 +14218,2237 @@
       "Рыночные условия": true
     },
     "timestamp": "2025-10-05T21:27:59.793719"
+  },
+  {
+    "signal": {
+      "symbol": "BNBUSDT",
+      "entry_price": 1148.3,
+      "stop_loss": 1125.3339999999998,
+      "take_profit": 1217.198,
+      "score": 0.7499999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T21:28:03.096468",
+      "indicators": {
+        "current_price": 1148.3,
+        "sma_20": 1145.825,
+        "sma_50": 1147.348,
+        "ema_20": 1146.6167445782805,
+        "rsi": 55.78231292516986,
+        "macd": -0.07841602962207617,
+        "macd_signal": -0.8523359173077533,
+        "atr": 6.528571428571452,
+        "volume_avg": 2745.9545000000003
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": false,
+      "Моментум": true,
+      "Ликвидность": true,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T21:28:03.309696"
+  },
+  {
+    "signal": {
+      "symbol": "1000FLOKIUSDT",
+      "entry_price": 0.10273,
+      "stop_loss": 0.1006754,
+      "take_profit": 0.10889380000000001,
+      "score": 0.7499999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T21:55:42.331169",
+      "indicators": {
+        "current_price": 0.10433,
+        "sma_20": 0.10310699999999999,
+        "sma_50": 0.1032238,
+        "ema_20": 0.10296045645764348,
+        "rsi": 48.33906071019474,
+        "macd": -0.000210241564642763,
+        "macd_signal": -0.00040897880031233875,
+        "atr": 0.0015807142857142864,
+        "volume_avg": 11200354.95
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": false,
+      "Моментум": true,
+      "Ликвидность": false,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": true,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T21:55:43.424053"
+  },
+  {
+    "signal": {
+      "symbol": "1000NEIROCTOUSDT",
+      "entry_price": 0.2869,
+      "stop_loss": 0.28116199999999997,
+      "take_profit": 0.304114,
+      "score": 0.7499999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T21:55:42.628676",
+      "indicators": {
+        "current_price": 0.2866,
+        "sma_20": 0.27936500000000003,
+        "sma_50": 0.280848,
+        "ema_20": 0.28020074982343424,
+        "rsi": 65.44715447154476,
+        "macd": 0.00030142413989592276,
+        "macd_signal": -0.0008563941596198211,
+        "atr": 0.0036642857142857033,
+        "volume_avg": 338961.95
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": false,
+      "Моментум": true,
+      "Ликвидность": true,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T21:55:43.772855"
+  },
+  {
+    "signal": {
+      "symbol": "1INCHUSDT",
+      "entry_price": 0.2594,
+      "stop_loss": 0.254212,
+      "take_profit": 0.27496400000000004,
+      "score": 0.7499999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T21:55:45.376483",
+      "indicators": {
+        "current_price": 0.2612,
+        "sma_20": 0.25804499999999997,
+        "sma_50": 0.25892400000000004,
+        "ema_20": 0.2585060789980208,
+        "rsi": 69.41176470588204,
+        "macd": 3.9012400698534844e-05,
+        "macd_signal": -0.0004455120538853664,
+        "atr": 0.0015071428571428538,
+        "volume_avg": 151209.48500000004
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": false,
+      "Моментум": true,
+      "Ликвидность": true,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T21:55:45.667270"
+  },
+  {
+    "signal": {
+      "symbol": "ALCHUSDT",
+      "entry_price": 0.07752,
+      "stop_loss": 0.0759696,
+      "take_profit": 0.08217120000000001,
+      "score": 0.8999999999999999,
+      "strength": "STRONG",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T21:55:48.770227",
+      "indicators": {
+        "current_price": 0.07737,
+        "sma_20": 0.07591200000000001,
+        "sma_50": 0.078195,
+        "ema_20": 0.07619467480676924,
+        "rsi": 52.996108949416325,
+        "macd": -0.0007242929850909963,
+        "macd_signal": -0.001048088571003983,
+        "atr": 0.002394999999999999,
+        "volume_avg": 12877212.65
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": true,
+      "Моментум": true,
+      "Ликвидность": false,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": true,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T21:55:48.949675"
+  },
+  {
+    "signal": {
+      "symbol": "ALEOUSDT",
+      "entry_price": 0.2635,
+      "stop_loss": 0.26877,
+      "take_profit": 0.24769,
+      "score": 0.7,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T21:55:48.806926",
+      "indicators": {
+        "current_price": 0.2545,
+        "sma_20": 0.254545,
+        "sma_50": 0.25857800000000003,
+        "ema_20": 0.2549109945272345,
+        "rsi": 55.952380952380985,
+        "macd": -0.0014273178570722855,
+        "macd_signal": -0.0016910925247474076,
+        "atr": 0.0020000000000000018,
+        "volume_avg": 96291.0
+      },
+      "direction": "Short"
+    },
+    "checklist_results": {
+      "Тренд": false,
+      "Объем": true,
+      "Моментум": true,
+      "Ликвидность": false,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": true,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T21:55:49.639152"
+  },
+  {
+    "signal": {
+      "symbol": "ARBUSDT",
+      "entry_price": 0.4416,
+      "stop_loss": 0.432768,
+      "take_profit": 0.468096,
+      "score": 0.7499999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T21:55:53.053904",
+      "indicators": {
+        "current_price": 0.4378,
+        "sma_20": 0.43122,
+        "sma_50": 0.43226400000000004,
+        "ema_20": 0.4320979322776328,
+        "rsi": 66.84491978609634,
+        "macd": 0.00047586251327902396,
+        "macd_signal": -0.000656228935613194,
+        "atr": 0.003478571428571438,
+        "volume_avg": 1491324.995
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": false,
+      "Моментум": true,
+      "Ликвидность": true,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T21:55:53.212583"
+  },
+  {
+    "signal": {
+      "symbol": "APTUSDT",
+      "entry_price": 5.405,
+      "stop_loss": 5.2969,
+      "take_profit": 5.7293,
+      "score": 0.7999999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T21:55:53.050221",
+      "indicators": {
+        "current_price": 5.177,
+        "sma_20": 5.1571,
+        "sma_50": 5.1999,
+        "ema_20": 5.168115662768867,
+        "rsi": 60.19417475728153,
+        "macd": -0.012154210591315717,
+        "macd_signal": -0.019486162825534538,
+        "atr": 0.03900000000000008,
+        "volume_avg": 112411.79299999999
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": true,
+      "Моментум": true,
+      "Ликвидность": true,
+      "Финансирование": false,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T21:55:53.262048"
+  },
+  {
+    "signal": {
+      "symbol": "ASPUSDT",
+      "entry_price": 0.1222,
+      "stop_loss": 0.124644,
+      "take_profit": 0.114868,
+      "score": 0.7,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T21:55:54.903112",
+      "indicators": {
+        "current_price": 0.1231,
+        "sma_20": 0.12513999999999997,
+        "sma_50": 0.12656,
+        "ema_20": 0.12499936767881871,
+        "rsi": 46.8421052631579,
+        "macd": -0.0010571556781551472,
+        "macd_signal": -0.00108791188514125,
+        "atr": 0.0061214285714285685,
+        "volume_avg": 873755.8
+      },
+      "direction": "Short"
+    },
+    "checklist_results": {
+      "Тренд": false,
+      "Объем": true,
+      "Моментум": true,
+      "Ликвидность": false,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": true,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T21:55:55.573145"
+  },
+  {
+    "signal": {
+      "symbol": "ARCUSDT",
+      "entry_price": 0.02199,
+      "stop_loss": 0.0215502,
+      "take_profit": 0.0233094,
+      "score": 0.7999999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T21:55:54.901831",
+      "indicators": {
+        "current_price": 0.0227,
+        "sma_20": 0.022452000000000003,
+        "sma_50": 0.022515599999999997,
+        "ema_20": 0.022441561744167525,
+        "rsi": 55.279503105590074,
+        "macd": -2.464480500380742e-05,
+        "macd_signal": -5.0713273193223e-05,
+        "atr": 0.00024785714285714244,
+        "volume_avg": 534430.8
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": true,
+      "Моментум": true,
+      "Ликвидность": false,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T21:55:55.695288"
+  },
+  {
+    "signal": {
+      "symbol": "ATOMUSDT",
+      "entry_price": 4.204,
+      "stop_loss": 4.11992,
+      "take_profit": 4.45624,
+      "score": 0.8999999999999999,
+      "strength": "STRONG",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T21:55:58.031247",
+      "indicators": {
+        "current_price": 4.148,
+        "sma_20": 4.10965,
+        "sma_50": 4.1194,
+        "ema_20": 4.11535727188899,
+        "rsi": 68.10344827586177,
+        "macd": 0.0010065033200445939,
+        "macd_signal": -0.005081416734808956,
+        "atr": 0.02042857142857159,
+        "volume_avg": 50501.28499999999
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": true,
+      "Моментум": true,
+      "Ликвидность": true,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T21:55:58.265449"
+  },
+  {
+    "signal": {
+      "symbol": "ATHUSDT",
+      "entry_price": 0.05462,
+      "stop_loss": 0.0535276,
+      "take_profit": 0.0578972,
+      "score": 0.7999999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T21:55:58.627091",
+      "indicators": {
+        "current_price": 0.05323,
+        "sma_20": 0.052326000000000004,
+        "sma_50": 0.05249139999999999,
+        "ema_20": 0.05256124603375313,
+        "rsi": 68.31395348837206,
+        "macd": 0.00015835245567792644,
+        "macd_signal": -2.0928512661246547e-05,
+        "atr": 0.000565000000000001,
+        "volume_avg": 1182468.5
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": true,
+      "Моментум": true,
+      "Ликвидность": false,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T21:55:58.883403"
+  },
+  {
+    "signal": {
+      "symbol": "AVNTUSDT",
+      "entry_price": 1.1297,
+      "stop_loss": 1.107106,
+      "take_profit": 1.197482,
+      "score": 0.7499999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T21:56:01.769146",
+      "indicators": {
+        "current_price": 1.2057,
+        "sma_20": 1.182385,
+        "sma_50": 1.169096,
+        "ema_20": 1.1880318040135585,
+        "rsi": 60.779537149817294,
+        "macd": 0.01170511864571977,
+        "macd_signal": 0.006152740614472864,
+        "atr": 0.02533571428571432,
+        "volume_avg": 393727.55
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": false,
+      "Моментум": true,
+      "Ликвидность": false,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": true,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T21:56:02.126527"
+  },
+  {
+    "signal": {
+      "symbol": "BNBUSDT",
+      "entry_price": 1161.4,
+      "stop_loss": 1138.172,
+      "take_profit": 1231.084,
+      "score": 0.7499999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T21:56:07.546577",
+      "indicators": {
+        "current_price": 1148.8,
+        "sma_20": 1145.3799999999999,
+        "sma_50": 1147.66,
+        "ema_20": 1146.4122705380291,
+        "rsi": 54.47154471544711,
+        "macd": -0.2688847706829165,
+        "macd_signal": -1.2500391611071635,
+        "atr": 7.1214285714285905,
+        "volume_avg": 2695.9534999999996
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": false,
+      "Моментум": true,
+      "Ликвидность": true,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T21:56:08.976663"
+  },
+  {
+    "signal": {
+      "symbol": "BUSDT",
+      "entry_price": 0.27129,
+      "stop_loss": 0.2658642,
+      "take_profit": 0.2875674,
+      "score": 0.7999999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T21:56:10.910950",
+      "indicators": {
+        "current_price": 0.29064,
+        "sma_20": 0.2864605,
+        "sma_50": 0.2853256,
+        "ema_20": 0.2870401346140241,
+        "rsi": 66.41988365943939,
+        "macd": 0.0012330773267903994,
+        "macd_signal": 0.0006712226346024386,
+        "atr": 0.0033785714285714413,
+        "volume_avg": 74332.0
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": true,
+      "Моментум": true,
+      "Ликвидность": false,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T21:56:11.322473"
+  },
+  {
+    "signal": {
+      "symbol": "1000NEIROCTOUSDT",
+      "entry_price": 0.2871,
+      "stop_loss": 0.281358,
+      "take_profit": 0.30432600000000004,
+      "score": 0.7499999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:00:21.239287",
+      "indicators": {
+        "current_price": 0.2845,
+        "sma_20": 0.279025,
+        "sma_50": 0.28079799999999994,
+        "ema_20": 0.2795271490067371,
+        "rsi": 56.68016194331982,
+        "macd": -0.0002835403853594931,
+        "macd_signal": -0.0011462418049103054,
+        "atr": 0.0036928571428571327,
+        "volume_avg": 326113.15
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": false,
+      "Моментум": true,
+      "Ликвидность": true,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:00:22.118718"
+  },
+  {
+    "signal": {
+      "symbol": "1INCHUSDT",
+      "entry_price": 0.2595,
+      "stop_loss": 0.25431,
+      "take_profit": 0.27507000000000004,
+      "score": 0.7499999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:00:24.382430",
+      "indicators": {
+        "current_price": 0.2604,
+        "sma_20": 0.257905,
+        "sma_50": 0.258926,
+        "ema_20": 0.25822250083302634,
+        "rsi": 62.96296296296317,
+        "macd": -0.00021975398552742664,
+        "macd_signal": -0.000566695833235399,
+        "atr": 0.0015214285714285705,
+        "volume_avg": 149822.02000000002
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": false,
+      "Моментум": true,
+      "Ликвидность": true,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:00:24.697585"
+  },
+  {
+    "signal": {
+      "symbol": "ADAUSDT",
+      "entry_price": 0.8537,
+      "stop_loss": 0.836626,
+      "take_profit": 0.9049220000000001,
+      "score": 0.7499999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:00:26.462020",
+      "indicators": {
+        "current_price": 0.8463,
+        "sma_20": 0.83721,
+        "sma_50": 0.83886,
+        "ema_20": 0.8384892578454274,
+        "rsi": 68.14814814814811,
+        "macd": 0.00021323165811293343,
+        "macd_signal": -0.0011407917854698757,
+        "atr": 0.004707142857142846,
+        "volume_avg": 2365275.1
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": false,
+      "Моментум": true,
+      "Ликвидность": true,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:00:26.700973"
+  },
+  {
+    "signal": {
+      "symbol": "ALCHUSDT",
+      "entry_price": 0.07743,
+      "stop_loss": 0.0758814,
+      "take_profit": 0.0820758,
+      "score": 0.7499999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:00:28.985837",
+      "indicators": {
+        "current_price": 0.07722,
+        "sma_20": 0.07600749999999999,
+        "sma_50": 0.0782492,
+        "ema_20": 0.07607095837340028,
+        "rsi": 51.19139123750958,
+        "macd": -0.0009409114088517051,
+        "macd_signal": -0.0011290613889255916,
+        "atr": 0.0023199999999999987,
+        "volume_avg": 12090117.15
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": false,
+      "Моментум": true,
+      "Ликвидность": false,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": true,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:00:29.242535"
+  },
+  {
+    "signal": {
+      "symbol": "AKEUSDT",
+      "entry_price": 0.001693,
+      "stop_loss": 0.0016591400000000001,
+      "take_profit": 0.00179458,
+      "score": 0.7499999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:00:29.546037",
+      "indicators": {
+        "current_price": 0.001893,
+        "sma_20": 0.00186815,
+        "sma_50": 0.0019099600000000003,
+        "ema_20": 0.001885985492408307,
+        "rsi": 48.62385321100916,
+        "macd": -1.07509149879718e-05,
+        "macd_signal": -1.6812827603980675e-05,
+        "atr": 5.657142857142857e-05,
+        "volume_avg": 82527740.0
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": false,
+      "Моментум": true,
+      "Ликвидность": false,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": true,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:00:30.186156"
+  },
+  {
+    "signal": {
+      "symbol": "ALEOUSDT",
+      "entry_price": 0.2637,
+      "stop_loss": 0.268974,
+      "take_profit": 0.247878,
+      "score": 0.7,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:00:29.566564",
+      "indicators": {
+        "current_price": 0.2544,
+        "sma_20": 0.25474500000000005,
+        "sma_50": 0.258752,
+        "ema_20": 0.25495430175951506,
+        "rsi": 52.272727272727344,
+        "macd": -0.0015798645833696723,
+        "macd_signal": -0.0017574011531088678,
+        "atr": 0.00208571428571429,
+        "volume_avg": 92623.55
+      },
+      "direction": "Short"
+    },
+    "checklist_results": {
+      "Тренд": false,
+      "Объем": true,
+      "Моментум": true,
+      "Ликвидность": false,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": true,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:00:30.239786"
+  },
+  {
+    "signal": {
+      "symbol": "ALICEUSDT",
+      "entry_price": 0.3264,
+      "stop_loss": 0.319872,
+      "take_profit": 0.34598400000000007,
+      "score": 0.7999999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:00:32.810251",
+      "indicators": {
+        "current_price": 0.3123,
+        "sma_20": 0.30816,
+        "sma_50": 0.311672,
+        "ema_20": 0.3089585704745976,
+        "rsi": 58.50000000000006,
+        "macd": -0.0009442494647813326,
+        "macd_signal": -0.0017671697574321809,
+        "atr": 0.003007142857142851,
+        "volume_avg": 44055.875
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": true,
+      "Моментум": true,
+      "Ликвидность": false,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:00:33.063557"
+  },
+  {
+    "signal": {
+      "symbol": "APEXUSDT",
+      "entry_price": 2.018,
+      "stop_loss": 1.9776399999999998,
+      "take_profit": 2.13908,
+      "score": 0.7999999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:00:35.063640",
+      "indicators": {
+        "current_price": 1.9487,
+        "sma_20": 1.9348499999999997,
+        "sma_50": 1.94052,
+        "ema_20": 1.9298582255309582,
+        "rsi": 46.53074646497865,
+        "macd": -0.011239367495099684,
+        "macd_signal": -0.011626502123143945,
+        "atr": 0.05390000000000001,
+        "volume_avg": 425217.63
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": true,
+      "Моментум": true,
+      "Ликвидность": false,
+      "Финансирование": false,
+      "Волатильность": true,
+      "Уровни": true,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:00:35.246764"
+  },
+  {
+    "signal": {
+      "symbol": "ARBUSDT",
+      "entry_price": 0.4417,
+      "stop_loss": 0.432866,
+      "take_profit": 0.468202,
+      "score": 0.7499999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:00:35.073167",
+      "indicators": {
+        "current_price": 0.4373,
+        "sma_20": 0.43083,
+        "sma_50": 0.432256,
+        "ema_20": 0.43149773467794006,
+        "rsi": 63.49206349206364,
+        "macd": -1.1603817660021942e-05,
+        "macd_signal": -0.0009397958290015883,
+        "atr": 0.0035500000000000093,
+        "volume_avg": 1487732.27
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": false,
+      "Моментум": true,
+      "Ликвидность": true,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:00:35.286431"
+  },
+  {
+    "signal": {
+      "symbol": "ARCUSDT",
+      "entry_price": 0.02199,
+      "stop_loss": 0.0215502,
+      "take_profit": 0.0233094,
+      "score": 0.7999999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:00:36.967351",
+      "indicators": {
+        "current_price": 0.0225,
+        "sma_20": 0.022447,
+        "sma_50": 0.022516399999999995,
+        "ema_20": 0.022414354561771866,
+        "rsi": 47.26027397260271,
+        "macd": -5.4233662987457354e-05,
+        "macd_signal": -5.7206404191985655e-05,
+        "atr": 0.00024785714285714244,
+        "volume_avg": 504207.95
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": true,
+      "Моментум": true,
+      "Ликвидность": false,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:00:37.170267"
+  },
+  {
+    "signal": {
+      "symbol": "ARKMUSDT",
+      "entry_price": 0.5416,
+      "stop_loss": 0.5307679999999999,
+      "take_profit": 0.574096,
+      "score": 0.7999999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:00:37.298860",
+      "indicators": {
+        "current_price": 0.5352,
+        "sma_20": 0.5278600000000001,
+        "sma_50": 0.5308740000000001,
+        "ema_20": 0.5289640612231178,
+        "rsi": 62.90322580645145,
+        "macd": -0.00043957922885939915,
+        "macd_signal": -0.0016235040987815266,
+        "atr": 0.004335714285714292,
+        "volume_avg": 91847.95
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": true,
+      "Моментум": true,
+      "Ликвидность": false,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:00:37.515677"
+  },
+  {
+    "signal": {
+      "symbol": "ATOMUSDT",
+      "entry_price": 4.202,
+      "stop_loss": 4.11796,
+      "take_profit": 4.4541200000000005,
+      "score": 0.7499999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:00:39.333763",
+      "indicators": {
+        "current_price": 4.139,
+        "sma_20": 4.10785,
+        "sma_50": 4.119440000000001,
+        "ema_20": 4.111921456413538,
+        "rsi": 63.063063063062735,
+        "macd": -0.0020262366209209404,
+        "macd_signal": -0.006608032381502506,
+        "atr": 0.020357142857143056,
+        "volume_avg": 47496.805
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": false,
+      "Моментум": true,
+      "Ликвидность": true,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:00:39.571006"
+  },
+  {
+    "signal": {
+      "symbol": "AXSUSDT",
+      "entry_price": 2.236,
+      "stop_loss": 2.1912800000000003,
+      "take_profit": 2.3701600000000003,
+      "score": 0.7499999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:00:43.060129",
+      "indicators": {
+        "current_price": 2.224,
+        "sma_20": 2.1961500000000003,
+        "sma_50": 2.1996200000000004,
+        "ema_20": 2.1993201208547335,
+        "rsi": 66.27906976744174,
+        "macd": 0.0013777563357413314,
+        "macd_signal": -0.0025665761185482117,
+        "atr": 0.015071428571428624,
+        "volume_avg": 13880.689999999999
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": false,
+      "Моментум": true,
+      "Ликвидность": true,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:00:43.331824"
+  },
+  {
+    "signal": {
+      "symbol": "BOMEUSDT",
+      "entry_price": 0.001733,
+      "stop_loss": 0.00169834,
+      "take_profit": 0.00183698,
+      "score": 0.7499999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:00:47.216477",
+      "indicators": {
+        "current_price": 0.001734,
+        "sma_20": 0.0016959000000000002,
+        "sma_50": 0.0017057400000000003,
+        "ema_20": 0.001700613610047675,
+        "rsi": 65.76576576576585,
+        "macd": 3.9890029742317874e-07,
+        "macd_signal": -5.4517368946715345e-06,
+        "atr": 1.871428571428572e-05,
+        "volume_avg": 30220990.0
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": false,
+      "Моментум": true,
+      "Ликвидность": true,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:00:47.430191"
+  },
+  {
+    "signal": {
+      "symbol": "BROCCOLIUSDT",
+      "entry_price": 0.03206,
+      "stop_loss": 0.0314188,
+      "take_profit": 0.0339836,
+      "score": 0.7999999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:00:47.228168",
+      "indicators": {
+        "current_price": 0.03277,
+        "sma_20": 0.03188099999999999,
+        "sma_50": 0.032082,
+        "ema_20": 0.03202952224490394,
+        "rsi": 69.33333333333343,
+        "macd": 7.117373251312731e-05,
+        "macd_signal": -5.42872006248859e-05,
+        "atr": 0.0004349999999999999,
+        "volume_avg": 1019319.9
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": true,
+      "Моментум": true,
+      "Ликвидность": false,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:00:48.312388"
+  },
+  {
+    "signal": {
+      "symbol": "BNBUSDT",
+      "entry_price": 1160.8,
+      "stop_loss": 1137.5839999999998,
+      "take_profit": 1230.448,
+      "score": 0.7499999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:00:47.234398",
+      "indicators": {
+        "current_price": 1149.7,
+        "sma_20": 1145.2499999999998,
+        "sma_50": 1147.818,
+        "ema_20": 1146.1609832772253,
+        "rsi": 50.12468827930192,
+        "macd": -0.5216575217273203,
+        "macd_signal": -1.4960055230840834,
+        "atr": 7.7071428571428635,
+        "volume_avg": 2675.7355
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": false,
+      "Моментум": true,
+      "Ликвидность": true,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:00:48.410678"
+  },
+  {
+    "signal": {
+      "symbol": "1000NEIROCTOUSDT",
+      "entry_price": 0.2873,
+      "stop_loss": 0.28155399999999997,
+      "take_profit": 0.30453800000000003,
+      "score": 0.7499999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:03:08.373948",
+      "indicators": {
+        "current_price": 0.2845,
+        "sma_20": 0.279025,
+        "sma_50": 0.28079799999999994,
+        "ema_20": 0.27952714995462424,
+        "rsi": 56.68016194331982,
+        "macd": -0.00028354766016303046,
+        "macd_signal": -0.0011462525037908506,
+        "atr": 0.0036928571428571327,
+        "volume_avg": 326113.15
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": false,
+      "Моментум": true,
+      "Ликвидность": true,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:03:09.212334"
+  },
+  {
+    "signal": {
+      "symbol": "1INCHUSDT",
+      "entry_price": 0.2594,
+      "stop_loss": 0.254212,
+      "take_profit": 0.27496400000000004,
+      "score": 0.7499999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:03:11.724086",
+      "indicators": {
+        "current_price": 0.2604,
+        "sma_20": 0.257905,
+        "sma_50": 0.258926,
+        "ema_20": 0.2582225003590828,
+        "rsi": 62.96296296296317,
+        "macd": -0.00021975034812571348,
+        "macd_signal": -0.000566690483795232,
+        "atr": 0.0015214285714285705,
+        "volume_avg": 149822.02000000002
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": false,
+      "Моментум": true,
+      "Ликвидность": true,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:03:11.902995"
+  },
+  {
+    "signal": {
+      "symbol": "ADAUSDT",
+      "entry_price": 0.8534,
+      "stop_loss": 0.8363320000000001,
+      "take_profit": 0.9046040000000001,
+      "score": 0.7499999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:03:14.267257",
+      "indicators": {
+        "current_price": 0.8463,
+        "sma_20": 0.83721,
+        "sma_50": 0.83886,
+        "ema_20": 0.8384892564235972,
+        "rsi": 68.14814814814811,
+        "macd": 0.00021324257031807292,
+        "macd_signal": -0.0011407757371491203,
+        "atr": 0.004707142857142846,
+        "volume_avg": 2365275.1
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": false,
+      "Моментум": true,
+      "Ликвидность": true,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:03:14.510999"
+  },
+  {
+    "signal": {
+      "symbol": "ALCHUSDT",
+      "entry_price": 0.07794,
+      "stop_loss": 0.0763812,
+      "take_profit": 0.08261639999999999,
+      "score": 0.7499999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:03:16.351430",
+      "indicators": {
+        "current_price": 0.07722,
+        "sma_20": 0.07600749999999999,
+        "sma_50": 0.0782492,
+        "ema_20": 0.07607096074311778,
+        "rsi": 51.19139123750958,
+        "macd": -0.0009409295958603264,
+        "macd_signal": -0.0011290881361267593,
+        "atr": 0.0023199999999999987,
+        "volume_avg": 12090117.15
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": false,
+      "Моментум": true,
+      "Ликвидность": false,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": true,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:03:16.593146"
+  },
+  {
+    "signal": {
+      "symbol": "ALEOUSDT",
+      "entry_price": 0.2631,
+      "stop_loss": 0.268362,
+      "take_profit": 0.24731399999999998,
+      "score": 0.7,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:03:16.697388",
+      "indicators": {
+        "current_price": 0.2544,
+        "sma_20": 0.25474500000000005,
+        "sma_50": 0.258752,
+        "ema_20": 0.2549542989158542,
+        "rsi": 52.272727272727344,
+        "macd": -0.0015798427589593933,
+        "macd_signal": -0.001757369056467507,
+        "atr": 0.00208571428571429,
+        "volume_avg": 92623.55
+      },
+      "direction": "Short"
+    },
+    "checklist_results": {
+      "Тренд": false,
+      "Объем": true,
+      "Моментум": true,
+      "Ликвидность": false,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": true,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:03:16.862129"
+  },
+  {
+    "signal": {
+      "symbol": "AKEUSDT",
+      "entry_price": 0.001685,
+      "stop_loss": 0.0016513,
+      "take_profit": 0.0017861,
+      "score": 0.7499999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:03:16.914878",
+      "indicators": {
+        "current_price": 0.001893,
+        "sma_20": 0.00186815,
+        "sma_50": 0.0019099600000000003,
+        "ema_20": 0.001885985454492828,
+        "rsi": 48.62385321100916,
+        "macd": -1.0750623995833646e-05,
+        "macd_signal": -1.6812399648761954e-05,
+        "atr": 5.657142857142857e-05,
+        "volume_avg": 82527740.0
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": false,
+      "Моментум": true,
+      "Ликвидность": false,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": true,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:03:17.157848"
+  },
+  {
+    "signal": {
+      "symbol": "ALICEUSDT",
+      "entry_price": 0.3268,
+      "stop_loss": 0.320264,
+      "take_profit": 0.346408,
+      "score": 0.7999999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:03:19.309597",
+      "indicators": {
+        "current_price": 0.3123,
+        "sma_20": 0.30816,
+        "sma_50": 0.311672,
+        "ema_20": 0.30895857237037144,
+        "rsi": 58.50000000000006,
+        "macd": -0.0009442640143881298,
+        "macd_signal": -0.001767191155193001,
+        "atr": 0.003007142857142851,
+        "volume_avg": 44055.875
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": true,
+      "Моментум": true,
+      "Ликвидность": false,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:03:19.568390"
+  },
+  {
+    "signal": {
+      "symbol": "ARBUSDT",
+      "entry_price": 0.4421,
+      "stop_loss": 0.433258,
+      "take_profit": 0.46862600000000004,
+      "score": 0.7499999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:03:21.458999",
+      "indicators": {
+        "current_price": 0.4373,
+        "sma_20": 0.43083,
+        "sma_50": 0.432256,
+        "ema_20": 0.4314977365737142,
+        "rsi": 63.49206349206364,
+        "macd": -1.161836726704113e-05,
+        "macd_signal": -0.0009398172267626964,
+        "atr": 0.0035500000000000093,
+        "volume_avg": 1487732.27
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": false,
+      "Моментум": true,
+      "Ликвидность": true,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:03:21.676252"
+  },
+  {
+    "signal": {
+      "symbol": "APEXUSDT",
+      "entry_price": 2.0016,
+      "stop_loss": 1.9615679999999998,
+      "take_profit": 2.121696,
+      "score": 0.7999999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:03:21.621573",
+      "indicators": {
+        "current_price": 1.9487,
+        "sma_20": 1.9348499999999997,
+        "sma_50": 1.94052,
+        "ema_20": 1.9298581478042247,
+        "rsi": 46.53074646497865,
+        "macd": -0.01123877096121717,
+        "macd_signal": -0.011625624814946094,
+        "atr": 0.05390000000000001,
+        "volume_avg": 425217.63
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": true,
+      "Моментум": true,
+      "Ликвидность": false,
+      "Финансирование": false,
+      "Волатильность": true,
+      "Уровни": true,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:03:22.828206"
+  },
+  {
+    "signal": {
+      "symbol": "ARKMUSDT",
+      "entry_price": 0.5415,
+      "stop_loss": 0.53067,
+      "take_profit": 0.57399,
+      "score": 0.7999999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:03:24.460147",
+      "indicators": {
+        "current_price": 0.5352,
+        "sma_20": 0.5278600000000001,
+        "sma_50": 0.5308740000000001,
+        "ema_20": 0.5289640607491745,
+        "rsi": 62.90322580645145,
+        "macd": -0.000439575591457686,
+        "macd_signal": -0.0016234987493413413,
+        "atr": 0.004335714285714292,
+        "volume_avg": 91847.95
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": true,
+      "Моментум": true,
+      "Ликвидность": false,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:03:24.711226"
+  },
+  {
+    "signal": {
+      "symbol": "ARCUSDT",
+      "entry_price": 0.0221,
+      "stop_loss": 0.021658,
+      "take_profit": 0.023426000000000002,
+      "score": 0.7999999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:03:24.538798",
+      "indicators": {
+        "current_price": 0.0225,
+        "sma_20": 0.022447,
+        "sma_50": 0.022516399999999995,
+        "ema_20": 0.02241435508310971,
+        "rsi": 47.26027397260271,
+        "macd": -5.4237664129354324e-05,
+        "macd_signal": -5.721228857624247e-05,
+        "atr": 0.00024785714285714244,
+        "volume_avg": 504207.95
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": true,
+      "Моментум": true,
+      "Ликвидность": false,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:03:24.784991"
+  },
+  {
+    "signal": {
+      "symbol": "ATOMUSDT",
+      "entry_price": 4.203,
+      "stop_loss": 4.11894,
+      "take_profit": 4.45518,
+      "score": 0.7499999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:03:26.464669",
+      "indicators": {
+        "current_price": 4.139,
+        "sma_20": 4.10785,
+        "sma_50": 4.119440000000001,
+        "ema_20": 4.111921461152973,
+        "rsi": 63.063063063062735,
+        "macd": -0.002026272994937628,
+        "macd_signal": -0.0066080858759034085,
+        "atr": 0.020357142857143056,
+        "volume_avg": 47496.805
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": false,
+      "Моментум": true,
+      "Ликвидность": true,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:03:26.669089"
+  },
+  {
+    "signal": {
+      "symbol": "AXSUSDT",
+      "entry_price": 2.237,
+      "stop_loss": 2.19226,
+      "take_profit": 2.37122,
+      "score": 0.7499999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:03:29.537786",
+      "indicators": {
+        "current_price": 2.224,
+        "sma_20": 2.1961500000000003,
+        "sma_50": 2.1996200000000004,
+        "ema_20": 2.199320125594168,
+        "rsi": 66.27906976744174,
+        "macd": 0.0013777199617237557,
+        "macd_signal": -0.002566629612951221,
+        "atr": 0.015071428571428624,
+        "volume_avg": 13880.689999999999
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": false,
+      "Моментум": true,
+      "Ликвидность": true,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:03:29.810301"
+  },
+  {
+    "signal": {
+      "symbol": "BROCCOLIUSDT",
+      "entry_price": 0.03215,
+      "stop_loss": 0.031507,
+      "take_profit": 0.034079,
+      "score": 0.7999999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:03:33.570722",
+      "indicators": {
+        "current_price": 0.03277,
+        "sma_20": 0.03188099999999999,
+        "sma_50": 0.032082,
+        "ema_20": 0.032029522671453085,
+        "rsi": 69.33333333333343,
+        "macd": 7.117045885159795e-05,
+        "macd_signal": -5.4292015121079113e-05,
+        "atr": 0.0004349999999999999,
+        "volume_avg": 1019319.9
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": true,
+      "Моментум": true,
+      "Ликвидность": false,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:03:33.879301"
+  },
+  {
+    "signal": {
+      "symbol": "BNBUSDT",
+      "entry_price": 1162.2,
+      "stop_loss": 1138.9560000000001,
+      "take_profit": 1231.932,
+      "score": 0.7499999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:03:33.959551",
+      "indicators": {
+        "current_price": 1149.7,
+        "sma_20": 1145.2499999999998,
+        "sma_50": 1147.818,
+        "ema_20": 1146.1609899124346,
+        "rsi": 50.12468827930192,
+        "macd": -0.5217084453515781,
+        "macd_signal": -1.4960804152472729,
+        "atr": 7.7071428571428635,
+        "volume_avg": 2675.7355
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": false,
+      "Моментум": true,
+      "Ликвидность": true,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:03:34.335727"
+  },
+  {
+    "signal": {
+      "symbol": "BOMEUSDT",
+      "entry_price": 0.001735,
+      "stop_loss": 0.0017002999999999999,
+      "take_profit": 0.0018391000000000002,
+      "score": 0.7499999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:03:33.993191",
+      "indicators": {
+        "current_price": 0.001734,
+        "sma_20": 0.0016959000000000002,
+        "sma_50": 0.0017057400000000003,
+        "ema_20": 0.0017006136195265459,
+        "rsi": 65.76576576576585,
+        "macd": 3.988275493892364e-07,
+        "macd_signal": -5.451843883475616e-06,
+        "atr": 1.871428571428572e-05,
+        "volume_avg": 30220990.0
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": false,
+      "Моментум": true,
+      "Ликвидность": true,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:03:35.096424"
+  },
+  {
+    "signal": {
+      "symbol": "1000NEIROCTOUSDT",
+      "entry_price": 0.2871,
+      "stop_loss": 0.281358,
+      "take_profit": 0.30432600000000004,
+      "score": 0.7499999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:09:29.155188",
+      "indicators": {
+        "current_price": 0.2845,
+        "sma_20": 0.279025,
+        "sma_50": 0.28079799999999994,
+        "ema_20": 0.2795271490067371,
+        "rsi": 56.68016194331982,
+        "macd": -0.0002835403853594931,
+        "macd_signal": -0.0011462418049103054,
+        "atr": 0.0036928571428571327,
+        "volume_avg": 326113.15
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": false,
+      "Моментум": true,
+      "Ликвидность": true,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:09:30.076422"
+  },
+  {
+    "signal": {
+      "symbol": "1INCHUSDT",
+      "entry_price": 0.2595,
+      "stop_loss": 0.25431,
+      "take_profit": 0.27507000000000004,
+      "score": 0.7499999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:09:32.356755",
+      "indicators": {
+        "current_price": 0.2604,
+        "sma_20": 0.257905,
+        "sma_50": 0.258926,
+        "ema_20": 0.25822250083302634,
+        "rsi": 62.96296296296317,
+        "macd": -0.00021975398552742664,
+        "macd_signal": -0.000566695833235399,
+        "atr": 0.0015214285714285705,
+        "volume_avg": 149822.02000000002
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": false,
+      "Моментум": true,
+      "Ликвидность": true,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:09:32.529703"
+  },
+  {
+    "signal": {
+      "symbol": "ADAUSDT",
+      "entry_price": 0.8528,
+      "stop_loss": 0.835744,
+      "take_profit": 0.903968,
+      "score": 0.7499999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:09:34.829855",
+      "indicators": {
+        "current_price": 0.8463,
+        "sma_20": 0.83721,
+        "sma_50": 0.83886,
+        "ema_20": 0.8384892535799361,
+        "rsi": 68.14814814814811,
+        "macd": 0.00021326439472868497,
+        "macd_signal": -0.001140743640507426,
+        "atr": 0.004707142857142846,
+        "volume_avg": 2365275.1
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": false,
+      "Моментум": true,
+      "Ликвидность": true,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:09:35.110151"
+  },
+  {
+    "signal": {
+      "symbol": "ALCHUSDT",
+      "entry_price": 0.07772,
+      "stop_loss": 0.0761656,
+      "take_profit": 0.0823832,
+      "score": 0.7499999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:09:37.292846",
+      "indicators": {
+        "current_price": 0.07722,
+        "sma_20": 0.07600749999999999,
+        "sma_50": 0.0782492,
+        "ema_20": 0.07607095970044207,
+        "rsi": 51.19139123750958,
+        "macd": -0.0009409215935765325,
+        "macd_signal": -0.0011290763673582386,
+        "atr": 0.0023199999999999987,
+        "volume_avg": 12090117.15
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": false,
+      "Моментум": true,
+      "Ликвидность": false,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": true,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:09:37.458257"
+  },
+  {
+    "signal": {
+      "symbol": "AKEUSDT",
+      "entry_price": 0.001699,
+      "stop_loss": 0.00166502,
+      "take_profit": 0.00180094,
+      "score": 0.7499999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:09:37.770932",
+      "indicators": {
+        "current_price": 0.001893,
+        "sma_20": 0.00186815,
+        "sma_50": 0.0019099600000000003,
+        "ema_20": 0.0018859855208449175,
+        "rsi": 48.62385321100916,
+        "macd": -1.0751133232074928e-05,
+        "macd_signal": -1.6813148570394387e-05,
+        "atr": 5.657142857142857e-05,
+        "volume_avg": 82527740.0
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": false,
+      "Моментум": true,
+      "Ликвидность": false,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": true,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:09:37.941563"
+  },
+  {
+    "signal": {
+      "symbol": "ALEOUSDT",
+      "entry_price": 0.2636,
+      "stop_loss": 0.268872,
+      "take_profit": 0.24778399999999998,
+      "score": 0.7,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:09:40.181149",
+      "indicators": {
+        "current_price": 0.2544,
+        "sma_20": 0.25474500000000005,
+        "sma_50": 0.258752,
+        "ema_20": 0.25495430128557156,
+        "rsi": 52.272727272727344,
+        "macd": -0.0015798609459679591,
+        "macd_signal": -0.001757395803668625,
+        "atr": 0.00208571428571429,
+        "volume_avg": 92623.55
+      },
+      "direction": "Short"
+    },
+    "checklist_results": {
+      "Тренд": false,
+      "Объем": true,
+      "Моментум": true,
+      "Ликвидность": false,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": true,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:09:40.356370"
+  },
+  {
+    "signal": {
+      "symbol": "ALICEUSDT",
+      "entry_price": 0.331,
+      "stop_loss": 0.32438,
+      "take_profit": 0.35086000000000006,
+      "score": 0.7999999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:09:40.526320",
+      "indicators": {
+        "current_price": 0.3123,
+        "sma_20": 0.30816,
+        "sma_50": 0.311672,
+        "ema_20": 0.30895859227599837,
+        "rsi": 58.50000000000006,
+        "macd": -0.0009444167852603047,
+        "macd_signal": -0.001767415831682598,
+        "atr": 0.003007142857142851,
+        "volume_avg": 44055.875
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": true,
+      "Моментум": true,
+      "Ликвидность": false,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:09:40.737444"
+  },
+  {
+    "signal": {
+      "symbol": "APEXUSDT",
+      "entry_price": 2.0282,
+      "stop_loss": 1.987636,
+      "take_profit": 2.149892,
+      "score": 0.7999999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:09:42.336482",
+      "indicators": {
+        "current_price": 1.9487,
+        "sma_20": 1.9348499999999997,
+        "sma_50": 1.94052,
+        "ema_20": 1.929858273873195,
+        "rsi": 46.53074646497865,
+        "macd": -0.01123973851007487,
+        "macd_signal": -0.011627047766047057,
+        "atr": 0.05390000000000001,
+        "volume_avg": 425217.63
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": true,
+      "Моментум": true,
+      "Ликвидность": false,
+      "Финансирование": false,
+      "Волатильность": true,
+      "Уровни": true,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:09:42.538289"
+  },
+  {
+    "signal": {
+      "symbol": "ARBUSDT",
+      "entry_price": 0.4426,
+      "stop_loss": 0.43374799999999997,
+      "take_profit": 0.469156,
+      "score": 0.7499999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:09:44.055204",
+      "indicators": {
+        "current_price": 0.4373,
+        "sma_20": 0.43083,
+        "sma_50": 0.432256,
+        "ema_20": 0.4314977389434316,
+        "rsi": 63.49206349206364,
+        "macd": -1.163655427577348e-05,
+        "macd_signal": -0.0009398439739637875,
+        "atr": 0.0035500000000000093,
+        "volume_avg": 1487732.27
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": false,
+      "Моментум": true,
+      "Ликвидность": true,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:09:44.233021"
+  },
+  {
+    "signal": {
+      "symbol": "ARCUSDT",
+      "entry_price": 0.02211,
+      "stop_loss": 0.0216678,
+      "take_profit": 0.023436600000000002,
+      "score": 0.7999999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:09:44.188513",
+      "indicators": {
+        "current_price": 0.0225,
+        "sma_20": 0.022447,
+        "sma_50": 0.022516399999999995,
+        "ema_20": 0.022414355130504063,
+        "rsi": 47.26027397260271,
+        "macd": -5.423802786952078e-05,
+        "macd_signal": -5.721282352026042e-05,
+        "atr": 0.00024785714285714244,
+        "volume_avg": 504207.95
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": true,
+      "Моментум": true,
+      "Ликвидность": false,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:09:44.994696"
+  },
+  {
+    "signal": {
+      "symbol": "ARKMUSDT",
+      "entry_price": 0.5415,
+      "stop_loss": 0.53067,
+      "take_profit": 0.57399,
+      "score": 0.7999999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:09:44.169440",
+      "indicators": {
+        "current_price": 0.5352,
+        "sma_20": 0.5278600000000001,
+        "sma_50": 0.5308740000000001,
+        "ema_20": 0.5289640607491745,
+        "rsi": 62.90322580645145,
+        "macd": -0.000439575591457686,
+        "macd_signal": -0.0016234987493413413,
+        "atr": 0.004335714285714292,
+        "volume_avg": 91847.95
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": true,
+      "Моментум": true,
+      "Ликвидность": false,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:09:45.131224"
+  },
+  {
+    "signal": {
+      "symbol": "ATOMUSDT",
+      "entry_price": 4.201,
+      "stop_loss": 4.11698,
+      "take_profit": 4.45306,
+      "score": 0.7499999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:09:46.700430",
+      "indicators": {
+        "current_price": 4.139,
+        "sma_20": 4.10785,
+        "sma_50": 4.119440000000001,
+        "ema_20": 4.111921451674104,
+        "rsi": 63.063063063062735,
+        "macd": -0.0020262002469033646,
+        "macd_signal": -0.006607978887099589,
+        "atr": 0.020357142857143056,
+        "volume_avg": 47496.805
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": false,
+      "Моментум": true,
+      "Ликвидность": true,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:09:46.961920"
+  },
+  {
+    "signal": {
+      "symbol": "AXSUSDT",
+      "entry_price": 2.237,
+      "stop_loss": 2.19226,
+      "take_profit": 2.37122,
+      "score": 0.7499999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:09:50.177689",
+      "indicators": {
+        "current_price": 2.224,
+        "sma_20": 2.1961500000000003,
+        "sma_50": 2.1996200000000004,
+        "ema_20": 2.199320125594168,
+        "rsi": 66.27906976744174,
+        "macd": 0.0013777199617237557,
+        "macd_signal": -0.002566629612951221,
+        "atr": 0.015071428571428624,
+        "volume_avg": 13880.689999999999
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": false,
+      "Моментум": true,
+      "Ликвидность": true,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:09:50.341939"
+  },
+  {
+    "signal": {
+      "symbol": "BNBUSDT",
+      "entry_price": 1159.6,
+      "stop_loss": 1136.408,
+      "take_profit": 1229.176,
+      "score": 0.7499999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:09:53.719978",
+      "indicators": {
+        "current_price": 1149.7,
+        "sma_20": 1145.2499999999998,
+        "sma_50": 1147.818,
+        "ema_20": 1146.1609775899035,
+        "rsi": 50.12468827930192,
+        "macd": -0.5216138729069826,
+        "macd_signal": -1.4959413298013073,
+        "atr": 7.7071428571428635,
+        "volume_avg": 2675.7355
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": false,
+      "Моментум": true,
+      "Ликвидность": true,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:09:53.944924"
+  },
+  {
+    "signal": {
+      "symbol": "BOMEUSDT",
+      "entry_price": 0.001733,
+      "stop_loss": 0.00169834,
+      "take_profit": 0.00183698,
+      "score": 0.7499999999999999,
+      "strength": "MEDIUM",
+      "position_size": 0.0,
+      "risk_amount": 0.0,
+      "timestamp": "2025-10-05T22:09:53.723485",
+      "indicators": {
+        "current_price": 0.001734,
+        "sma_20": 0.0016959000000000002,
+        "sma_50": 0.0017057400000000003,
+        "ema_20": 0.001700613610047675,
+        "rsi": 65.76576576576585,
+        "macd": 3.9890029742317874e-07,
+        "macd_signal": -5.4517368946715345e-06,
+        "atr": 1.871428571428572e-05,
+        "volume_avg": 30220990.0
+      },
+      "direction": "Long"
+    },
+    "checklist_results": {
+      "Тренд": true,
+      "Объем": false,
+      "Моментум": true,
+      "Ликвидность": true,
+      "Финансирование": true,
+      "Волатильность": true,
+      "Уровни": false,
+      "Рыночные условия": true
+    },
+    "timestamp": "2025-10-05T22:09:54.773126"
   }
 ]

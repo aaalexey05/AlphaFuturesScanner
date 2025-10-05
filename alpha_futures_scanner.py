@@ -408,6 +408,14 @@ class AlphaFuturesScanner:
     async def get_symbol_data(self, symbol: str) -> Optional[Dict]:
         """Получение полных данных по символу"""
         try:
+            # Получаем реальную tick цену (lastPrice)
+            ticker_response = await asyncio.get_event_loop().run_in_executor(
+                None,
+                lambda: self.bybit_client.get_tickers(category="linear", symbol=symbol)
+            )
+            current_price = float(ticker_response['result']['list'][0]['lastPrice'])  # Реальная tick цена
+            logger.info(f"Текущая tick цена для {symbol}: {current_price:.4f}")
+            
             # Получаем данные свечей
             kline_response = await asyncio.get_event_loop().run_in_executor(
                 None,
@@ -440,6 +448,7 @@ class AlphaFuturesScanner:
             
             return {
                 'symbol': symbol,
+                'last_price': current_price,  # Добавляем реальную tick цену
                 'klines': kline_response['result']['list'],
                 'orderbook': orderbook_response['result'],
                 'funding_rate': funding_response['result']
@@ -735,14 +744,13 @@ class AlphaFuturesScanner:
             )
             
             if checklist_passed:
-                entry_price = indicators['current_price']
-                # Устанавливаем стоп-лосс и тейк-профит в зависимости от направления
+                entry_price = data['last_price']  # Используем реальную tick цену вместо indicators['current_price']
                 if signal_direction == "Long":
-                    stop_loss = entry_price * 0.98  # 2% ниже для Long
-                    take_profit = entry_price * 1.06  # 6% выше для Long
+                    stop_loss = entry_price * 0.98
+                    take_profit = entry_price * 1.06
                 else:  # Short
-                    stop_loss = entry_price * 1.02  # 2% выше для Short
-                    take_profit = entry_price * 0.94  # 6% ниже для Short
+                    stop_loss = entry_price * 1.02
+                    take_profit = entry_price * 0.94
                 
                 position_info = await self.calculate_position_size(
                     symbol, entry_price, stop_loss
@@ -772,10 +780,6 @@ class AlphaFuturesScanner:
                 self.save_trade_history()
                 
                 self.signals_sent += 1
-                
-        except Exception as e:
-            logger.error(f"Ошибка анализа {symbol}: {e}")
-            self.errors_count += 1
                 
         except Exception as e:
             logger.error(f"Ошибка анализа {symbol}: {e}")
